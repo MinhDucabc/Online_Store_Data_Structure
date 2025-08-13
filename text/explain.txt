@@ -1,0 +1,10 @@
+giai thich khi nao dung class, public class 
+sao o day la dung nhu nay
+
+class SortingAlgorithms
+
+    // Insertion Sort by Title
+    public static void insertionSortByTitle(List<Book> books) 
+
+    public static void selectionSortByAuthor(List<Book> books) 
+

@@ -1,0 +1,13 @@
+InsertionSort
+    public int insertionSort(List<Book> Books, compareType) {
+        for (int i = 1; i < Books.size(); i++){
+            Book key = Books.get(i);
+            j = i - 1;
+            while (j > 0 && compare(Books.get(j), key, compareType)){
+                Books.set(j+1, Books.get(j));
+                j--;
+            };
+            Books.set(j+1, key)
+        }
+    }
+
