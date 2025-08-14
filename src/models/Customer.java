@@ -4,8 +4,8 @@ package models;
 public class Customer extends User {
     private String address; // Địa chỉ
 
-    public Customer(int userId, String name, String email, String phoneNumber, String address) {
-        super(userId, name, email, phoneNumber); // Gọi constructor lớp cha
+    public Customer(String name, String email, String phoneNumber, String address) {
+        super(name, email, phoneNumber); // Gọi constructor lớp cha
         this.address = address;
     }
 

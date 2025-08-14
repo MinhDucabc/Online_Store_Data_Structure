@@ -2,13 +2,14 @@
 package models;
 
 public class User {
+    protected static int count = 1;
     protected int userId;         // Mã người dùng
     protected String name;        // Tên
     protected String email;       // Email
     protected String phoneNumber; // Số điện thoại
 
-    public User(int userId, String name, String email, String phoneNumber) {
-        this.userId = userId;
+    public User(String name, String email, String phoneNumber) {
+        this.userId = count++;
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;

@@ -1,0 +1,21 @@
+package data;
+
+import models.Admin;
+import models.Customer;
+import java.util.ArrayList;
+import java.util.List;
+
+public class UserData {
+    public static final List<Customer> CUSTOMERS = new ArrayList<>();
+    public static final List<Admin> ADMINS = new ArrayList<>();
+
+    static {
+        // Customers
+        CUSTOMERS.add(new Customer("Alice Johnson", "alice@example.com", "123-456-7890", "123 Main St, New York"));
+        CUSTOMERS.add(new Customer("Bob Smith", "bob@example.com", "555-234-5678", "456 Oak Ave, Los Angeles"));
+
+        // Admins
+        ADMINS.add(new Admin("David Lee", "david@example.com", "111-222-3333", "SuperAdmin"));
+        ADMINS.add(new Admin("Emma Wilson", "emma@example.com", "444-555-6666", "Moderator"));
+    }
+}

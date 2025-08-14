@@ -4,8 +4,8 @@ package models;
 public class Admin extends User {
     private String role; // Vai trò quản trị, ví dụ: "SuperAdmin", "Moderator"
 
-    public Admin(int userId, String name, String email, String phoneNumber, String role) {
-        super(userId, name, email, phoneNumber);
+    public Admin(String name, String email, String phoneNumber, String role) {
+        super(name, email, phoneNumber);
         this.role = role;
     }
 
