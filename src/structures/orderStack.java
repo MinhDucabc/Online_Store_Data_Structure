@@ -1,18 +1,25 @@
 package structures;
 
 import java.util.Stack;
-
 import models.Order;
 
-public class orderStack {
+public class OrderStack {
     private Stack<Order> orderStack = new Stack<>();
 
     public void push(Order order) {
         orderStack.push(order);
     }
 
-    public Order pop(){
-        return orderStack.isEmpty() ? null : stack.pop();
+    public Order peek() {
+        return orderStack.isEmpty() ? null : orderStack.peek();
+    }
+
+    public Order pop() {
+        return orderStack.isEmpty() ? null : orderStack.pop(); // sửa stack -> orderStack
+    }
+
+    public boolean isEmpty() {
+        return orderStack.isEmpty();
     }
 
     public void displayStack() {

@@ -1,65 +1,49 @@
 package models;
 
+import models.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Order {
-    public static int counter = 1;
+    private static int counter = 1;
 
-    private int orderId;
-    private int customerId;      // liên kết tới Customer qua ID
-    private String customerName; // lưu tên để hiển thị nhanh
-    private ArrayList<Book> products;
-    private ArrayList<Integer> quantities;
-    private String status; // {Pending, Complete}
+    private final int orderId;
+    private final int customerId;
+    private final String customerName;
+    private final List<OrderItem> items;
+    private String status; // Pending, Completed
 
-    // Constructor từ Customer
-    public Order(Customer customer, ArrayList<Book> products, ArrayList<Integer> quantities) {
+    public Order(Customer customer, List<OrderItem> items) {
         this.orderId = counter++;
-        this.customerId = customer.getCustomerId(); // lưu ID
-        this.customerName = customer.getName();     // lưu tên
-        this.products = products;
-        this.quantities = quantities;
+        this.customerId = customer.getUserId();
+        this.customerName = customer.getName();
+        this.items = new ArrayList<>(items); // copy tránh sửa ngoài
         this.status = "Pending";
     }
 
     // Getter
-    public int getOrderId() {
-        return orderId;
-    }
-
-    public int getCustomerId() {
-        return customerId;
-    }
-
-    public String getCustomerName() {
-        return customerName;
-    }
-
-    public ArrayList<Book> getProducts() {
-        return products;
-    }
-
-    public ArrayList<Integer> getQuantities() {
-        return quantities;
-    }
-
-    public String getStatus() {
-        return status;
-    }
+    public int getOrderId() { return orderId; }
+    public int getCustomerId() { return customerId; }
+    public String getCustomerName() { return customerName; }
+    public List<OrderItem> getItems() { return items; }
+    public String getStatus() { return status; }
 
     // Setter
-    public void setStatus(String status) {
-        this.status = status;
+    public void setStatus(String status) { this.status = status; }
+
+    // Tính tổng tiền
+    public double getTotalAmount() {
+        return items.stream().mapToDouble(OrderItem::getTotal).sum();
     }
 
-    // In thông tin
-    @Override
-    public String toString() {
-        return "Order{" +
-                "orderId=" + orderId +
-                ", customerId=" + customerId +
-                ", customerName='" + customerName + '\'' +
-                ", status='" + status + '\'' +
-                '}';
+    // In chi tiết đơn hàng
+    public void printOrderDetails() {
+        System.out.println("===== Order #" + orderId + " =====");
+        System.out.println("Customer: " + customerName + " (ID: " + customerId + ")");
+        System.out.println("Status: " + status);
+        for (OrderItem item : items) {
+            System.out.println("- " + item);
+        }
+        System.out.println("Total: " + getTotalAmount());
     }
 }

@@ -1,72 +1,15 @@
+// Lớp con: Customer
 package models;
 
+public class Customer extends User {
+    private String address; // Địa chỉ
 
-public class Customer {
-    private int customerId;       // Mã khách hàng
-    private String name;          // Tên khách hàng
-    private String email;         // Email
-    private String phoneNumber;   // Số điện thoại
-    private String address;       // Địa chỉ
-
-    // Constructor đầy đủ
-    public Customer(int customerId, String name, String email, String phoneNumber, String address) {
-        this.customerId = customerId;
-        this.name = name;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
+    public Customer(int userId, String name, String email, String phoneNumber, String address) {
+        super(userId, name, email, phoneNumber); // Gọi constructor lớp cha
         this.address = address;
     }
 
-    // Getter và Setter
-    public int getCustomerId() {
-        return customerId;
-    }
-
-    public void setCustomerId(int customerId) {
-        this.customerId = customerId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    // toString để in thông tin khách hàng
-    @Override
-    public String toString() {
-        return "Customer{" +
-                "customerId=" + customerId +
-                ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", address='" + address + '\'' +
-                '}';
-    }
+    // Getter / Setter riêng cho Customer
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
 }

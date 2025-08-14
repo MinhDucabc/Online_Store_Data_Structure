@@ -1,10 +1,10 @@
 package structures;
 
-import java.util.LinkedList;
 import java.util.Queue;
+import models.Order;
 
 public class OrderQueue {
-    private Queue<Order> orderQueue = new LinkedList<>();
+    private Queue<Order> orderQueue = new Queue<>();
 
     public void enqueue(Order order) {
         orderQueue.add(order);

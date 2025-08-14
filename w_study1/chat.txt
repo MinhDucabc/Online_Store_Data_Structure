@@ -1,0 +1,8 @@
+Draft Idea:
+    User flow va cau truc -> Hoan thien usecase sach
+Hoi Code cu the: 
+    Java design specification -> mo hinh ke thua user -> cai thien tim kiem tuyen tinh -> cai thien bookservice
+Giai thich Code + sua code
+    Giai thich ghi de phuong thuc
+Them that nho
+    Add publish Date -> Add something -> Dich vu cho nguoi dung

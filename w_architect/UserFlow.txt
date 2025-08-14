@@ -1,0 +1,44 @@
+Proposed Service Flow
+1. Common Services (dùng cho tất cả)
+    BookService → xem sách, lấy chi tiết sách.
+        GenericSearchService → cho tìm kiếm sách, user, order.
+
+        GenericSortService → cho sắp xếp sách, user, order.
+
+    ValidationService → kiểm tra dữ liệu nhập liệu.
+
+    NotificationService → gửi thông báo (email, push, in-app).
+
+    AuthService → xử lý đăng nhập/đăng ký, phân quyền (User / Admin).
+
+2. User Services (chỉ khách hàng đã đăng nhập)
+
+    CartService → thêm/xóa/sửa sách trong giỏ.
+
+    CheckoutService → xử lý thanh toán, tạo Order Pending.
+
+    OrderService → quản lý đơn hàng (Pending → Processing → Completed) theo quyền User.
+
+Luồng:
+    Người dùng chưa đăng nhập:
+        BookService (xem sách) → có thể dùng GenericSearch/Sort
+
+    Người dùng đã đăng nhập:
+        AuthService (login) → BookService (chi tiết) → CartService → CheckoutService → OrderService
+
+
+3. Admin Services (chỉ admin)
+    CustomerManagementService	- Lấy danh sách customer.
+        - Tìm kiếm/lọc customer.
+        - Khóa/mở khóa tài khoản.	Dùng chung GenericSearch
+    OrderManagementService	- Lấy danh sách order theo trạng thái.
+        - Xử lý trạng thái (Pending → Processing → Completed).
+        - Xem chi tiết Order.	Dùng Queue (Pending), Stack (Processing)
+    BookManagementService	
+        - Cập nhật số lượng sách khi admin nhập hàng hoặc khi user đặt mua.
+        - Thêm/sửa/xóa sách.
+
+Luồng:
+    AuthService (Admin) → UserManagementService / OrderManagementService / InventoryService
+
+    Admin services cũng có thể dùng GenericSearchService, GenericSortService, ValidationService, NotificationService.

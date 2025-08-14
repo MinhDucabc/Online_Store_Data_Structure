@@ -1,0 +1,72 @@
+1. Người dùng (User)
+    UC-01: Xem tất cả sách
+    •	Mô tả: Người dùng vào trang chủ để xem danh sách sách.
+    1.  Người dùng truy cập Trang chủ.
+    2.  Hệ thống hiển thị danh sách sách dưới dạng bảng/lưới:
+        	Ảnh bìa.
+        	Tiêu đề.
+        	Tác giả.
+        	Giá.
+        	Nút Add to Cart + ô nhập số lượng.
+    3.  Người dùng có thể cuộn/trang để xem thêm sách.
+________________________________________
+    UC-02: Tìm kiếm sách
+    •	Mô tả: Người dùng tìm kiếm sách theo tên, tác giả, hoặc thể loại.
+    1.	Người dùng nhập từ khóa vào ô tìm kiếm.
+    2.	Chọn tiêu chí tìm kiếm (tên / tác giả / thể loại).
+    3.	Hệ thống lọc và hiển thị kết quả ở trang kết quả tìm kiếm.
+________________________________________
+    UC-03: Sắp xếp sách
+    •	Mô tả: Người dùng sắp xếp danh sách sách.
+    1.	Người dùng chọn tiêu chí sắp xếp (Giá, Tên, Ngày phát hành).
+    2.	Hệ thống sắp xếp và hiển thị kết quả ngay trên trang.
+________________________________________
+    UC-04: Quản lý giỏ hàng
+    •	Mô tả: Người dùng thêm, chỉnh sửa hoặc xóa sách trong giỏ.
+    1.	Người dùng nhấn Add to Cart ở trang chủ hoặc kết quả tìm kiếm.
+    2.	Hệ thống thêm sách vào giỏ hàng.
+    3.	Người dùng vào Trang giỏ hàng:
+        	Xem danh sách sách đã thêm.
+        	Chỉnh sửa số lượng.
+        	Xóa sách nếu không muốn mua.
+    4.	Ở phần bên phải, người dùng nhập thông tin khách hàng (tên, email, địa chỉ, số điện thoại).
+________________________________________
+    UC-05: Đặt hàng (Checkout)
+    •	Mô tả: Người dùng hoàn tất mua hàng.
+    1.	Tại Trang giỏ hàng, người dùng nhấn Checkout.
+    2.	Hệ thống:
+        	Tạo một Order ở trạng thái Pending.
+        	Thêm order vào OrderQueue để chờ xử lý.
+    3.	Hiển thị thông báo đặt hàng thành công.
+________________________________________
+    UC-06: Xem lịch sử đơn hàng
+    •	Mô tả: Người dùng xem lại các đơn hàng đã đặt.
+    1.	Người dùng vào Trang Lịch sử Order.
+    2.	Hệ thống hiển thị danh sách đơn hàng (mã đơn, ngày, trạng thái, tổng tiền).
+    3.	Người dùng có thể nhấn vào đơn hàng để xem chi tiết.
+
+
+2. Quản trị viên (Admin)
+    UC-07: Quản lý người dùng
+    •	Mô tả: Admin xem và quản lý tài khoản người dùng.
+    1.	Admin đăng nhập vào Trang Admin.
+    2.	Chọn mục Quản lý người dùng.
+    3.	Hệ thống hiển thị danh sách tất cả user (ID, tên, email, ngày đăng ký).
+    4.	Admin có thể tìm kiếm hoặc lọc người dùng.
+________________________________________
+    UC-08: Quản lý đơn hàng
+    •	Mô tả: Admin xử lý các đơn hàng.
+    1.	Admin chọn mục Quản lý đơn hàng.
+    2.	Hệ thống hiển thị:
+        	Pending Orders → lấy từ OrderQueue.
+        	Processing/Completed Orders → lấy từ OrderStack và toàn bộ danh sách Order.
+    3.	Admin có thể:
+        	Nhấn vào đơn hàng để xem chi tiết (bao gồm thông tin khách hàng và sách đã mua).
+        	Cập nhật trạng thái đơn hàng (Pending → Processing → Completed).
+________________________________________
+    UC-09: Tìm kiếm đơn hàng
+    •	Mô tả: Admin tìm kiếm đơn hàng theo mã hoặc tên khách hàng.
+    1.	Admin nhập từ khóa tìm kiếm.
+    2.	Hệ thống lọc và hiển thị danh sách đơn hàng phù hợp.
+    3.	Admin nhấn vào từng đơn để xem chi tiết.
+

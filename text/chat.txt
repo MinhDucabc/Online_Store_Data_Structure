@@ -1,6 +1,0 @@
-Hoi Code: 
-    Java design specification
-Giai thich Code + sua code
-    Giai thich ghi de phuong thuc
-Them that nho
-    Add publish Date -> Add something

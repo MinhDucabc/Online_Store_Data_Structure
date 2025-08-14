@@ -1,44 +1,54 @@
 package models;
 
+import java.time.LocalDate;
+
 public class Book {
     private static int counter = 1;
-    private int bookId;
+    private final int bookId;
     private String title;
     private String author;
+    private float price;
     private int quantity;
-    private String publishedDate; // Ngày xuất bản (dùng String hoặc LocalDate)
+    private LocalDate publishedDate;
+    private String category; // Thêm category
 
-    public Book(String title, String author, int quantity, String publishedDate) {
+    public Book(String title, String author, float price, int quantity, LocalDate publishedDate, String category) {
         this.bookId = counter++;
         this.title = title;
         this.author = author;
+        this.price = price;
         this.quantity = quantity;
         this.publishedDate = publishedDate;
+        this.category = category;
     }
+
     @Override
     public String toString() {
-        return "Book {" +
-                    "title=" + title + '\'' +
-                    ", author=" + author + '\'' +
-                    ", quantity=" + quantity +
-                    ", publishedDate=" + publishedDate + '\'' +
+        return "Book{" +
+                "bookId=" + bookId +
+                ", title='" + title + '\'' +
+                ", author='" + author + '\'' +
+                ", price=" + price +
+                ", quantity=" + quantity +
+                ", publishedDate=" + publishedDate +
+                ", category='" + category + '\'' +
                 '}';
     }
 
-    // Getter & Setter (nếu cần)
-    public String getTitle() {
-        return title;
-    }
+    // Getter
+    public int getBookId() { return bookId; }
+    public String getTitle() { return title; }
+    public String getAuthor() { return author; }
+    public float getPrice() { return price; }
+    public int getQuantity() { return quantity; }
+    public LocalDate getPublishedDate() { return publishedDate; }
+    public String getCategory() { return category; }
 
-    public String getAuthor() {
-        return author;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public String getPublishedDate() {
-        return publishedDate;
-    }
+    // Setter
+    public void setTitle(String title) { this.title = title; }
+    public void setAuthor(String author) { this.author = author; }
+    public void setPrice(float price) { this.price = price; }
+    public void setQuantity(int quantity) { this.quantity = quantity; }
+    public void setPublishedDate(LocalDate publishedDate) { this.publishedDate = publishedDate; }
+    public void setCategory(String category) { this.category = category; }
 }

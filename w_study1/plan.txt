@@ -1,0 +1,18 @@
+Model: (Them admin)
+    User -> Customer -> Admin
+
+Structure:
+    Sua lai cau truc du lieu
+
+Algorithm
+    Search sort ung dung cho book, order doi voi nguoi dung, moi orders doi voi admin
+
+Service
+
+UI
+
+(De sau)
+Nap du lieu, luu vao file json
+
+Test Book, Order, Customer
+    CRUD
