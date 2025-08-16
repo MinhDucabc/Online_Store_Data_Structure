@@ -1,74 +1,50 @@
 package test.Book;
 
-import data.BookData;
 import models.Book;
 import services.BookService;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class BookServiceTest {
     public static void main(String[] args) {
+        // 1. Tao service
+        BookService service = new BookService();
+        
+        // 3. Lay toan bo sach
+        System.out.println("\n--- Danh sach sach ---");
+        service.getAllBooks().forEach(System.out::println);
 
-        // ===== 1. Khoi tao BookService voi du lieu BookData =====
-        BookService bookService = new BookService(BookData.BOOKS);
+        // 4. Tim sach theo ID
+        System.out.println("\n--- Tim sach ID = 2 ---");
+        System.out.println(service.getBookById(2));
 
-        // 1a. In tat ca sach
-        System.out.println("--- Tat ca sach ---");
-        bookService.getAllBooks().forEach(b -> 
-            System.out.println(b.getBookId() + " - " + b.getTitle() + " - " + b.getAuthor() + " - " + b.getPrice())
-        );
+        // 5. Tim kiem theo tieu de
+        System.out.println("\n--- Tim kiem tu khoa 'Basics' ---");
+        service.searchByTitle("Basics").forEach(System.out::println);
 
-        // 1b. Tim kiem sach theo title
-        System.out.println("\n--- Tim sach voi tu khoa 'Clean' ---");
-        List<Book> foundByTitle = bookService.searchByTitle("Clean");
-        foundByTitle.forEach(b -> System.out.println(b.getBookId() + " - " + b.getTitle()));
+        // 6. Tim kiem theo tac gia
+        System.out.println("\n--- Tim kiem tac gia 'John' ---");
+        service.searchByAuthor("John").forEach(System.out::println);
 
-        // 1c. Tim kiem sach theo author
-        System.out.println("\n--- Tim sach theo tac gia 'Robert' ---");
-        List<Book> foundByAuthor = bookService.searchByAuthor("Robert");
-        foundByAuthor.forEach(b -> System.out.println(b.getBookId() + " - " + b.getTitle() + " - " + b.getAuthor()));
+        // 7. Tim kiem theo category
+        System.out.println("\n--- Tim kiem category 'Programming' ---");
+        service.searchByCategory("Programming").forEach(System.out::println);
 
-        // 1d. Tim kiem sach theo category
-        System.out.println("\n--- Tim sach theo danh muc 'Computer' ---");
-        List<Book> foundByCategory = bookService.searchByCategory("Computer");
-        foundByCategory.forEach(b -> System.out.println(b.getBookId() + " - " + b.getTitle() + " - " + b.getCategory()));
+        // 8. Sap xep theo tieu de tang dan
+        System.out.println("\n--- Sap xep theo tieu de tang dan ---");
+        service.sortBooksByTitle(true);
+        service.getAllBooks().forEach(System.out::println);
 
-        // ===== 2. Sap xep sach =====
-        // 2a. Theo title tang dan
-        System.out.println("\n--- Sap xep theo title tang dan ---");
-        bookService.sortBooksByTitle(true);
-        bookService.getAllBooks().forEach(b -> System.out.println(b.getTitle()));
-
-        // 2b. Theo title giam dan
-        System.out.println("\n--- Sap xep theo title giam dan ---");
-        bookService.sortBooksByTitle(false);
-        bookService.getAllBooks().forEach(b -> System.out.println(b.getTitle()));
-
-        // 2c. Theo gia tang dan
-        System.out.println("\n--- Sap xep theo gia tang dan ---");
-        bookService.sortBooksByPrice(true);
-        bookService.getAllBooks().forEach(b -> System.out.println(b.getTitle() + " - " + b.getPrice()));
-
-        // 2d. Theo gia giam dan
+        // 9. Sap xep theo gia giam dan
         System.out.println("\n--- Sap xep theo gia giam dan ---");
-        bookService.sortBooksByPrice(false);
-        bookService.getAllBooks().forEach(b -> System.out.println(b.getTitle() + " - " + b.getPrice()));
+        service.sortBooksByPrice(false);
+        service.getAllBooks().forEach(System.out::println);
 
-        // 2e. Theo ngay xuat ban tang dan
+        // 10. Sap xep theo ngay xuat ban tang dan
         System.out.println("\n--- Sap xep theo ngay xuat ban tang dan ---");
-        bookService.sortBooksByPublishedDate(true);
-        bookService.getAllBooks().forEach(b -> System.out.println(b.getTitle() + " - " + b.getPublishedDate()));
-
-        // 2f. Theo ngay xuat ban giam dan
-        System.out.println("\n--- Sap xep theo ngay xuat ban giam dan ---");
-        bookService.sortBooksByPublishedDate(false);
-        bookService.getAllBooks().forEach(b -> System.out.println(b.getTitle() + " - " + b.getPublishedDate()));
-
-        // ===== 3. Lay sach theo ID =====
-        int testId = BookData.BOOKS.get(0).getBookId(); // lay id cua sach dau tien
-        System.out.println("\n--- Lay sach theo ID = " + testId + " ---");
-        Book bookById = bookService.getBookById(testId);
-        System.out.println(bookById != null ? (bookById.getTitle() + " - " + bookById.getAuthor()) : "Khong tim thay sach");
+        service.sortBooksByPublishedDate(true);
+        service.getAllBooks().forEach(System.out::println);
     }
 }

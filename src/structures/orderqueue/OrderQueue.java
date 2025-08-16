@@ -1,10 +1,15 @@
-package structures;
+package structures.orderqueue;
 
 import java.util.Queue;
+import java.util.LinkedList;
 import models.Order;
 
 public class OrderQueue {
-    private Queue<Order> orderQueue = new Queue<>();
+    private Queue<Order> orderQueue;
+
+    public OrderQueue() {
+        this.orderQueue = new LinkedList<>();
+    }
 
     public void enqueue(Order order) {
         orderQueue.add(order);
@@ -22,5 +27,10 @@ public class OrderQueue {
         for (Order order : orderQueue) {
             System.out.println(order);
         }
+    }
+
+    // getter
+    public Queue<Order> getOrders(){
+        return new LinkedList<>(orderQueue);
     }
 }

@@ -3,18 +3,19 @@ package algorithms;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Comparator;
+import java.util.function.Function;
 
 public class GenericSearch {
 
     // Linear search kiểu Comparator giống sort
-    public static <T> List<T> linearSearch(List<T> list, String keyword, Comparator<String> comparator, 
-                                        java.util.function.Function<T, String> fieldExtractor) {
+    public static <T> List<T> linearSearch(List<T> list, String keyword, 
+                                                Function<T, String> fieldExtractor) {
         List<T> result = new ArrayList<>();
         keyword = keyword.toLowerCase();
 
         for (T item : list) {
             String fieldValue = fieldExtractor.apply(item).toLowerCase();
-            if (comparator.compare(fieldValue, keyword) == 0) {
+            if (fieldValue.contains(keyword)) {
                 result.add(item);
             }
         }
@@ -27,9 +28,9 @@ public class GenericSearch {
         int low = 0, high = sortedList.size() - 1;
         int foundIndex = -1;
 
-        // Tìm 1 index match trước
+        // 1️⃣ Tìm một index match đầu tiên bằng binary search
         while (low <= high) {
-            int mid = (low + high) / 2;
+            int mid = low + (high - low) / 2;
             int cmp = comparator.compare(sortedList.get(mid), key);
 
             if (cmp == 0) {
@@ -42,20 +43,27 @@ public class GenericSearch {
             }
         }
 
-        if (foundIndex == -1) return results; // không tìm thấy
+        // Không tìm thấy
+        if (foundIndex == -1)
+            return results;
 
-        // tìm tất cả match về bên trái
-        int left = foundIndex;
+        // 2️⃣ Tìm tất cả match về bên trái
+        int left = foundIndex - 1;
         while (left >= 0 && comparator.compare(sortedList.get(left), key) == 0) {
-            results.add(0, sortedList.get(left));
             left--;
         }
+        // left + 1 là index đầu tiên match
 
-        // tìm tất cả match về bên phải
+        // 3️⃣ Tìm tất cả match về bên phải
         int right = foundIndex + 1;
         while (right < sortedList.size() && comparator.compare(sortedList.get(right), key) == 0) {
-            results.add(sortedList.get(right));
             right++;
+        }
+        // right - 1 là index cuối cùng match
+
+        // 4️⃣ Thêm tất cả phần tử match vào kết quả
+        for (int i = left + 1; i < right; i++) {
+            results.add(sortedList.get(i));
         }
 
         return results;

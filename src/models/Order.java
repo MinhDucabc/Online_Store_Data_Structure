@@ -1,6 +1,6 @@
 package models;
 
-import models.*;
+import models.OrderItem;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,5 +45,6 @@ public class Order {
             System.out.println("- " + item);
         }
         System.out.println("Total: " + getTotalAmount());
+        System.out.println("\n");
     }
 }

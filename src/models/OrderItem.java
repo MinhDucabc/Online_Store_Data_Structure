@@ -1,6 +1,7 @@
 package models;
 
 import models.Book;
+
 public class OrderItem {
     private final Book book;
     private final int quantity;

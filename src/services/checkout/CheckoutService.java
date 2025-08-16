@@ -1,29 +1,31 @@
-package services.User;
+package services.checkout;
 
+import data.OrderData;
 import models.*;
+import services.BookService;
+import services.User.CartService;
+import services.User.OrderService;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CheckoutService {
-
     private final BookService bookService;
     private final CartService cartService;
-    private final List<Order> orderHistory; // Lưu tạm orders
+    private final OrderService orderService;
 
-    public CheckoutService(BookService bookService, CartService cartService, List<Order> orderHistory) {
+    public CheckoutService(BookService bookService, CartService cartService, OrderService orderService) {
         this.bookService = bookService;
         this.cartService = cartService;
-        this.orderHistory = orderHistory;
+        this.orderService = orderService;
     }
 
-    /**
-     * Thực hiện thanh toán và tạo đơn hàng Pending
-     */
-    public Order checkout(String userId) {
+    public Order checkout(Customer customer) {
         List<CartItem> cartItems = cartService.getCartItems();
-        if (cartItems.isEmpty()) return null;
+        if (cartItems.isEmpty()) {
+            System.out.println("⚠️ Giỏ hàng đang trống!");
+            return null;
+        }
 
         // Kiểm tra tồn kho
         for (CartItem item : cartItems) {
@@ -33,26 +35,26 @@ public class CheckoutService {
             }
         }
 
-        // Giảm số lượng tồn kho tạm thời (nếu muốn)
+        // Giảm tồn kho
         for (CartItem item : cartItems) {
             Book book = bookService.getBookById(item.getBook().getBookId());
             book.setQuantity(book.getQuantity() - item.getQuantity());
         }
 
         // Tạo Order
-        Order order = new Order(userId, LocalDateTime.now(), "Pending");
         List<OrderItem> orderItems = new ArrayList<>();
         for (CartItem item : cartItems) {
             orderItems.add(new OrderItem(item.getBook(), item.getQuantity()));
         }
-        order.setItems(orderItems);
+        Order order = new Order(customer, orderItems);
 
-        // Lưu Order
-        orderHistory.add(order);
+        // Lưu vào OrderData
+        orderService.addOrder(order);
 
         // Xóa giỏ hàng
         cartService.clearCart();
-
+        
+        System.out.println("Thanh toan thanh cong");
         return order;
     }
 }

@@ -1,48 +1,36 @@
 package services.User;
 
 import models.Order;
+import structures.orderqueue.OrderQueue;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class OrderService {
-    private List<Order> orders = new ArrayList<>();
+    public OrderQueue orderqueue = new OrderQueue(); // ✅ thay vì List<Order>
 
     // Thêm đơn hàng mới
     public void addOrder(Order order) {
-        orders.add(order);
+        orderqueue.enqueue(order);
         System.out.println("✅ Đã thêm đơn hàng #" + order.getOrderId() + " cho khách " + order.getCustomerName());
     }
 
-    // Lấy danh sách đơn hàng của 1 khách hàng
-    public List<Order> getOrdersByCustomerId(int customerId) {
-        return orders.stream()
-                .filter(o -> o.getCustomerId() == customerId)
-                .collect(Collectors.toList());
+    // Show full don hang
+    public void showAllOrders(){
+        orderqueue.displayQueue();
     }
 
-    // Lấy tất cả đơn hàng (Admin)
+    // Lay full don hang
     public List<Order> getAllOrders() {
-        return new ArrayList<>(orders);
+        return new ArrayList<>(orderqueue.getOrders());
     }
-
-    // Tìm đơn hàng theo ID
-    public Order findOrderById(int orderId) {
-        return orders.stream()
-                .filter(o -> o.getOrderId() == orderId)
-                .findFirst()
-                .orElse(null);
-    }
-
-    // In danh sách đơn hàng (debug/test)
-    public void printOrders(List<Order> ordersList) {
-        if (ordersList.isEmpty()) {
-            System.out.println("Không có đơn hàng nào.");
-            return;
-        }
-        for (Order o : ordersList) {
-            o.printOrderDetails();
-            System.out.println("----------------------------");
-        }
+    
+    // Lay toan bo don hang cua mot khach hang
+    public List<Order> getOrdersByCustomerId(int customerId){
+        List<Order> allOrders = getAllOrders();
+        return allOrders.stream()
+                        .filter(o -> o.getCustomerId() == customerId)
+                        .collect(Collectors.toList());
     }
 }

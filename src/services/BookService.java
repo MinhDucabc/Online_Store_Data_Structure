@@ -2,6 +2,7 @@ package services;
 
 import algorithms.GenericSearch;
 import algorithms.GenericSort;
+import data.BookData;
 import models.Book;
 
 import java.util.ArrayList;
@@ -13,10 +14,16 @@ public class BookService {
 
     private final List<Book> books; // Danh sách sách hiện có
 
-    public BookService(List<Book> books) {
-        this.books = books;
+    // Constructor mặc định: lấy dữ liệu từ BookData
+    public BookService() {
+        if (BookData.BOOKS != null && !BookData.BOOKS.isEmpty()) {
+            this.books = BookData.BOOKS;
+            System.out.println("Đa tai du lieu sach tu BookData.");
+        } else {
+            this.books = new ArrayList<>();
+            System.out.println("Chua co sach trong BookData.");
+        }
     }
-
     // ===== 1. Lấy tất cả sách (có thể phân trang nếu muốn) =====
     public List<Book> getAllBooks() {
         return new ArrayList<>(books); // trả về copy tránh sửa ngoài ý muốn
@@ -31,18 +38,15 @@ public class BookService {
      */
     
     public List<Book> searchByTitle(String keyword) {
-        return GenericSearch.linearSearch(books, keyword,
-                (book, k) -> book.getTitle().toLowerCase().contains((String) k) ? 0 : 1);
+        return GenericSearch.linearSearch(books, keyword, Book::getTitle);
     }
 
     public List<Book> searchByAuthor(String keyword) {
-        return GenericSearch.linearSearch(books, keyword,
-                (book, k) -> book.getAuthor().toLowerCase().contains((String) k) ? 0 : 1);
+        return GenericSearch.linearSearch(books, keyword, Book::getAuthor);
     }
 
     public List<Book> searchByCategory(String keyword) {
-        return GenericSearch.linearSearch(books, keyword,
-                (book, k) -> book.getCategory().toLowerCase().contains((String) k) ? 0 : 1);
+        return GenericSearch.linearSearch(books, keyword, Book::getCategory);
     }
 
     // ===== 3. Sắp xếp sách =====

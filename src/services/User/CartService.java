@@ -4,9 +4,15 @@ import models.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import data.CartData;
+
 public class CartService {
 
-    private final List<CartItem> cartItems = new ArrayList<>();
+    private final List<CartItem> cartItems;
+
+    public CartService() {
+        this.cartItems = CartData.CART_ITEMS;
+    }
 
     // ===== 1. Thêm sách vào giỏ =====
     public void addToCart(Book book, int quantity) {
