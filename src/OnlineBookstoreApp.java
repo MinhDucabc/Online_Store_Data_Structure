@@ -6,7 +6,7 @@
 
 // public class OnlineBookstoreApp {
 //     public static void main(String[] args) {
-//         OrderQueue orderQueue = new OrderQueue();
+//         OrderQueuePending orderQueuePending = new OrderQueuePending();
 //         OrderStack orderHistory = new OrderStack();
 //         List<Order> allOrders = new ArrayList<>();
 
@@ -22,15 +22,15 @@
 //         ));
 
 //         // Enqueue Orders
-//         orderQueue.enqueue(o1);
-//         orderQueue.enqueue(o2);
+//         orderQueuePending.enqueue(o1);
+//         orderQueuePending.enqueue(o2);
 
 //         allOrders.add(o1);
 //         allOrders.add(o2);
 
 //         // Process Orders
-//         while (!orderQueue.isEmpty()) {
-//             Order current = orderQueue.dequeue();
+//         while (!orderQueuePending.isEmpty()) {
+//             Order current = orderQueuePending.dequeue();
 //             System.out.println("\nProcessing: " + current);
 
 //             // Sort books by title

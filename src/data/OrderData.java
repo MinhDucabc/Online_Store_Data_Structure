@@ -1,10 +1,16 @@
 package data;
 
 import models.Order;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class OrderData {
-    // Lưu tất cả order trong hệ thống
-    public static final List<Order> ORDERS = new ArrayList<>();
+    private static final Queue<Order> ordersPending = new LinkedList<>();
+    private static final Queue<Order> ordersProcessing = new LinkedList<>();
+    private static final Queue<Order> ordersDone = new LinkedList<>();
+
+    // ✅ Getters
+    public static Queue<Order> getOrdersPending() { return ordersPending; }
+    public static Queue<Order> getOrdersProcessing() { return ordersProcessing; }
+    public static Queue<Order> getOrdersDone() { return ordersDone; }
 }

@@ -36,7 +36,7 @@ ________________________________________
     1.	Tại Trang giỏ hàng, người dùng nhấn Checkout.
     2.	Hệ thống:
         	Tạo một Order ở trạng thái Pending.
-        	Thêm order vào OrderQueue để chờ xử lý.
+        	Thêm order vào OrderQueuePending để chờ xử lý.
     3.	Hiển thị thông báo đặt hàng thành công.
 ________________________________________
     UC-06: Xem lịch sử đơn hàng
@@ -58,7 +58,7 @@ ________________________________________
     •	Mô tả: Admin xử lý các đơn hàng.
     1.	Admin chọn mục Quản lý đơn hàng.
     2.	Hệ thống hiển thị:
-        	Pending Orders → lấy từ OrderQueue.
+        	Pending Orders → lấy từ OrderQueuePending.
         	Processing/Completed Orders → lấy từ OrderStack và toàn bộ danh sách Order.
     3.	Admin có thể:
         	Nhấn vào đơn hàng để xem chi tiết (bao gồm thông tin khách hàng và sách đã mua).

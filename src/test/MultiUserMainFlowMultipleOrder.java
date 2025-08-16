@@ -15,9 +15,10 @@ import data.BookData;
 public class MultiUserMainFlowMultipleOrder {
     public static int order_length = 6;
 
-    public static void main(String[] args) {
+    // public static void main(String[] args) {
+    public static void generateMultiOrdersfromMultiUsers(OrderService orderService) {
         BookService bookService = new BookService();
-        OrderService orderService = new OrderService();
+        // OrderService orderService = new OrderService();
 
         // 1️⃣ Lấy ngẫu nhiên 3 customer khác nhau
         Random rand = new Random();
