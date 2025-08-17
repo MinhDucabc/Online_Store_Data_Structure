@@ -5,7 +5,10 @@ import java.util.Comparator;
 import java.util.List;
 
 public class GenericSort {
-
+    public enum SortType {
+        INSERTION,
+        SELECTION,
+    }
     // Generic Insertion Sort
     public static <T> void insertionSort(List<T> list, Comparator<T> comparator) {
         for (int i = 1; i < list.size(); i++) {

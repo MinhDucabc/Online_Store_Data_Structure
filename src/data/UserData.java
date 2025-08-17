@@ -16,6 +16,7 @@ public class UserData {
         CUSTOMERS.add(new Customer("Charlie Brown", "charlie@example.com", "222-789-4561", "charliepass", "789 Pine Rd, Chicago"));
         CUSTOMERS.add(new Customer("Diana Prince", "diana@example.com", "333-987-6543", "dianapass", "321 Maple St, San Francisco"));
         CUSTOMERS.add(new Customer("Ethan Hunt", "ethan@example.com", "444-321-7654", "ethanpass", "654 Elm Blvd, Miami"));
+        CUSTOMERS.add(new Customer("Mr123", "mr123@gmail.com", "", "123456", ""));
 
         // Admins
         ADMINS.add(new Admin("David Lee", "david@example.com", "111-222-3333", "davidpass", "Admin"));

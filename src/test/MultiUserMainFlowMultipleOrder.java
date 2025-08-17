@@ -15,37 +15,39 @@ import data.BookData;
 
 public class MultiUserMainFlowMultipleOrder {
     public static int order_length = 6;
+    public static int nums_of_random_customers = 3; // số lượng khách hàng
+    public static int[] Books_per_order_range = {1, 5};
+    public static int[] book_quantity_range = {1, 3}; // số lượng sách trong mỗi đơn hàng
 
     // public static void main(String[] args) {
     public static void generateMultiOrdersfromMultiUsers(OrderService orderService, AuthService authService) {
         BookService bookService = new BookService();
         // OrderService orderService = new OrderService();
 
-        // 1️⃣ Lấy ngẫu nhiên 3 customer khác nhau
+        // 1️⃣ Lấy ngẫu nhiên nums_of_customers khác nhau
         Random rand = new Random();
-        int size = UserData.CUSTOMERS.size();
-        if (size < 3)
-            throw new IllegalArgumentException("Cần ít nhất 3 khách hàng");
 
-        int i, j, k;
-        do {
-            i = rand.nextInt(size);
-            j = rand.nextInt(size);
-            k = rand.nextInt(size);
-        } while (i == j || i == k || j == k);
+        List<Customer> customerList = UserData.CUSTOMERS;
+        if (customerList.isEmpty()) {
+            System.out.println("❌ Không có khách hàng nào để thực hiện đơn hàng. Dừng chương trình.");
+            return;
+        }
+        if (nums_of_random_customers > customerList.size()) {
+            System.out.println("❌ Không đủ khách hàng để chọn " + nums_of_random_customers + " khách hàng. Dừng chương trình.");
+            return;
+        }
+        Set<Customer> customersSet = new HashSet<>();
+        while (customersSet.size() < nums_of_random_customers) {
+            int randomIndex = rand.nextInt(customerList.size());
+            customersSet.add(customerList.get(randomIndex));
+        }
+        List<Customer> randomCustomerList = new ArrayList<>(customersSet);
 
-        Customer customer1 = UserData.CUSTOMERS.get(i);
-        Customer customer2 = UserData.CUSTOMERS.get(j);
-        Customer customer3 = UserData.CUSTOMERS.get(k);
-
-        List<Customer> customerList = new ArrayList<>();
-        customerList.addAll(Arrays.asList(customer1, customer2, customer3));
-
+        // 2️⃣ Sinh mot luong order nhat dinh giua nhieu random user
         boolean invalidOrder = false;
-        // 2️⃣ Sinh nhiều order
         for (int u = 0; u < order_length; u++) {
-            // Dang nhap customer ngẫu nhiên su dung AuthService
-            Customer randomCustomer = customerList.get(rand.nextInt(customerList.size()));
+            // 1. Dang nhap customer ngẫu nhiên su dung AuthService
+            Customer randomCustomer = randomCustomerList.get(rand.nextInt(randomCustomerList.size()));
             
             boolean loginSuccess = authService.login(randomCustomer.getEmail(), randomCustomer.getPassword());
             if (!loginSuccess) {
@@ -54,24 +56,36 @@ public class MultiUserMainFlowMultipleOrder {
             }
             Customer currentCustomer = authService.getLoggedInCustomer();
 
-            CartService cartService = new CartService();
 
-            // chọn random sách
+            // 2. chọn random sách voi so luong ngẫu nhiên
+            List<Book> bookList = new ArrayList<>(BookData.BOOKS);
+            if (bookList.isEmpty()) {
+                System.out.println("❌ Không có sách nào để chọn. Dừng chương trình.");
+                return;
+            }
+            if (bookList.size() < Books_per_order_range[1]) {
+                System.out.println("❌ Không đủ sách để tạo đơn hàng. Dừng chương trình.");
+                return;
+            }
             Set<Book> picked = new HashSet<>();
-            int nums_picked = rand.nextInt(3) + 1; // 1–3 sách
+            int nums_picked = rand.nextInt(Books_per_order_range[1] - Books_per_order_range[0] + 1) + Books_per_order_range[0]; // 1–3 sách
             while (picked.size() < nums_picked) {
-                Book randomBook = BookData.BOOKS.get(rand.nextInt(BookData.BOOKS.size()));
+                Book randomBook = bookList.get(rand.nextInt(bookList.size()));
                 picked.add(randomBook);
             }
 
             System.out.println("\n=== CUSTOMER " + currentCustomer.getName() + " TẠO ORDER #" + (u + 1) + " ===");
 
+            // Kiểm tra số lượng sách đã chọn
             System.out.println("\n=== NHỮNG QUYỂN SÁCH ĐÃ CHỌN ===");
             picked.forEach(b -> System.out.println(b.getTitle()));
 
+            // 3. Thêm sách vào giỏ hàng
+            CartService cartService = new CartService();
             System.out.println("\n=== THÊM SÁCH VÀO GIỎ HÀNG ===");
             for (Book b : picked) {
-                int qty = rand.nextInt(2) + 1;
+                // So luong sach ngẫu nhiên từ 1 den 3
+                int qty = rand.nextInt(book_quantity_range[1] - book_quantity_range[0] + 1) + 1;
                 if (qty > b.getQuantity() || qty <= 0) {
                     System.out.println(
                             "❌ Lỗi: " + b.getTitle() + " chỉ còn " + b.getQuantity() + " nhưng yêu cầu " + qty);
@@ -82,19 +96,19 @@ public class MultiUserMainFlowMultipleOrder {
                 System.out.println(b.getTitle() + " x " + qty);
             }
             if (invalidOrder) {
-                System.out.println("⚠️ Order " + (i + 1) + " bị hủy do vượt quá số lượng tồn kho!");
+                System.out.println("❌ Không thể tạo order do lỗi số lượng sách. Bỏ qua order này.");
                 continue; // tiep tuc vong lặp order
             }
 
-            // tồn kho trước checkout
-            System.out.println("\n=== TỒN KHO TRƯỚC CHECKOUT ===");
-            picked.forEach(b -> System.out.println(b.getTitle() + " còn: " + b.getQuantity()));
-
+            // 4. In tồn kho trước khi checkout
             // giỏ hàng hiện tại
             System.out.println("\n=== GIỎ HÀNG HIỆN TẠI ===");
             cartService.getCartItems()
                     .forEach(item -> System.out.println(item.getBook().getTitle() + " x " + item.getQuantity()));
             System.out.println("Tổng tiền: " + cartService.getTotalAmount());
+
+            System.out.println("\n=== TỒN KHO TRƯỚC CHECKOUT ===");
+            picked.forEach(b -> System.out.println(b.getTitle() + " còn: " + b.getQuantity()));
 
             // checkout
             CheckoutService checkoutService = new CheckoutService(bookService, cartService, orderService);
@@ -129,7 +143,7 @@ public class MultiUserMainFlowMultipleOrder {
 
             // 8️⃣ Logout
             System.out.println("\n=== LOGOUT ===");
-            authService.logout();
+            authService.logout(cartService);
         }
 
         // // 3️⃣ In tất cả order theo từng user

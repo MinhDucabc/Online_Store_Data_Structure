@@ -2,7 +2,10 @@ package services;
 
 import data.UserData;
 import models.Admin;
+import models.Cart;
+import models.CartItem;
 import models.Customer;
+import services.User.CartService;
 
 import java.util.List;
 
@@ -72,7 +75,7 @@ public class AuthService {
     }
 
     // ===== Logout =====
-    public void logout() {
+    public void logout(CartService cartService) {
         if (loggedInCustomer != null) {
             System.out.println("👋 User logged out: " + loggedInCustomer.getName());
             loggedInCustomer = null;
@@ -81,6 +84,14 @@ public class AuthService {
             loggedInAdmin = null;
         } else {
             System.out.println("⚠️ Không có ai đang đăng nhập.");
+        }
+        // Clear cart if customer logged out
+        if (cartService != null && loggedInCustomer != null) {
+            List<CartItem> cart = cartService.getCartItems();
+            if (cart != null) {
+                cartService.clearCart();;
+                System.out.println("🛒 Giỏ hàng đã được xóa khi đăng xuất.");
+            }
         }
     }
 

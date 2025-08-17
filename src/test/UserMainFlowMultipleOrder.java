@@ -112,6 +112,6 @@ public class UserMainFlowMultipleOrder {
 
         // 8️⃣ Logout
         System.out.println("\n=== LOGOUT ===");
-        authService.logout();
+        authService.logout(cartService);
     }
 }

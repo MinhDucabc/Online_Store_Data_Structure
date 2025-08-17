@@ -1,6 +1,9 @@
 package services.User;
 
 import models.*;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,10 +52,14 @@ public class CartService {
     }
 
     // ===== 5. Tính tổng tiền =====
-    public double getTotalAmount() {
-        return cartItems.stream()
-                .mapToDouble(item -> item.getBook().getPrice() * item.getQuantity())
-                .sum();
+    public BigDecimal getTotalAmount() {
+        BigDecimal total = BigDecimal.ZERO;
+        for (CartItem item : cartItems) {
+            BigDecimal price = BigDecimal.valueOf(item.getBook().getPrice());
+            BigDecimal quantity = BigDecimal.valueOf(item.getQuantity());
+            total = total.add(price.multiply(quantity));
+        }
+        return total.setScale(2, RoundingMode.HALF_UP);
     }
 
     // ===== 6. Xóa toàn bộ giỏ =====

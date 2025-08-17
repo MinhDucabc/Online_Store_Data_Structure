@@ -78,6 +78,6 @@ public class UserMainFlow {
         
         // 7️⃣ Logout sau khi xong
         System.out.println("\n=== LOGOUT ===");
-        authService.logout();
+        authService.logout(cartService);
     }
 }

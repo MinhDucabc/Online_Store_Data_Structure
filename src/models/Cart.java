@@ -3,14 +3,16 @@ package models;
 import models.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class Cart {
     private List<CartItem> items;
-    private double totalPrice;
+    private BigDecimal totalPrice;
 
     public Cart() {
         items = new ArrayList<>();
-        totalPrice = 0;
+        totalPrice = BigDecimal.ZERO;
     }
 
     public void addItem(Book book, int quantity) {
@@ -47,21 +49,30 @@ public class Cart {
     }
 
     private void recalculateTotal() {
-        totalPrice = 0;
+        totalPrice = BigDecimal.ZERO;
         for (CartItem item : items) {
-            totalPrice += item.getBook().getPrice() * item.getQuantity();
+            BigDecimal price = BigDecimal.valueOf(item.getBook().getPrice());
+            BigDecimal quantity = BigDecimal.valueOf(item.getQuantity());
+            totalPrice = totalPrice.add(price.multiply(quantity));
         }
+        totalPrice = totalPrice.setScale(2, RoundingMode.HALF_UP);
     }
 
     public List<CartItem> getItems() { return items; }
-    public double getTotalPrice() { return totalPrice; }
+    
+    public double getTotalPrice() { 
+        return totalPrice.doubleValue(); 
+    }
 
     public void displayCart() {
         System.out.println("===== CART =====");
         for (CartItem item : items) {
+            BigDecimal price = BigDecimal.valueOf(item.getBook().getPrice());
+            BigDecimal quantity = BigDecimal.valueOf(item.getQuantity());
+            BigDecimal subtotal = price.multiply(quantity).setScale(2, RoundingMode.HALF_UP);
             System.out.println(item.getBook().getTitle() + " x " + item.getQuantity() +
-                               " = " + (item.getBook().getPrice() * item.getQuantity()));
+                             " = $" + subtotal);
         }
-        System.out.println("Total: " + totalPrice);
+        System.out.println("Total: $" + totalPrice);
     }
 }

@@ -2,6 +2,8 @@ package services;
 
 import algorithms.GenericSearch;
 import algorithms.GenericSort;
+import algorithms.GenericSearch.SearchType;
+import algorithms.GenericSort.SortType;
 import data.BookData;
 import models.Book;
 
@@ -24,6 +26,7 @@ public class BookService {
             System.out.println("Chua co sach trong BookData.");
         }
     }
+
     // ===== 1. Lấy tất cả sách (có thể phân trang nếu muốn) =====
     public List<Book> getAllBooks() {
         return new ArrayList<>(books); // trả về copy tránh sửa ngoài ý muốn
@@ -36,49 +39,86 @@ public class BookService {
      *                Book::getAuthor
      * @return danh sách sách match
      */
-    
-    public List<Book> searchByTitle(String keyword) {
-        return GenericSearch.linearSearch(books, keyword, Book::getTitle);
+
+    public List<Book> searchByTitle(String keyword, SearchType searchType, SortType sortType) {
+        if (searchType == SearchType.LINEAR) {
+            return GenericSearch.linearSearch(books, keyword, Book::getTitle);
+        } else if (searchType == SearchType.BINARY_TREE) {
+            List<Book> sortedBooks = sortBooksByTitle(books, true, sortType);
+            return GenericSearch.binarySearchTree(
+                    sortedBooks,
+                    keyword,
+                    Book::getTitle,
+                    String::compareToIgnoreCase);
+        }
+        return new ArrayList<>();
     }
 
-    public List<Book> searchByAuthor(String keyword) {
-        return GenericSearch.linearSearch(books, keyword, Book::getAuthor);
+    public List<Book> searchByAuthor(String keyword, SearchType searchType, SortType sortType) {
+        if (searchType == SearchType.LINEAR) {
+            return GenericSearch.linearSearch(books, keyword, Book::getAuthor);
+        } else if (searchType == SearchType.BINARY_TREE) {
+            List<Book> sortedBooks = sortBooksByAuthor(books, true, sortType);
+            return GenericSearch.binarySearchTree(
+                    sortedBooks,
+                    keyword,
+                    Book::getAuthor,
+                    String::compareToIgnoreCase);
+        }
+        return new ArrayList<>();
     }
 
     // ===== 3. Sắp xếp sách =====
-    public List<Book> sortBooksByTitle(List<Book> bookList, boolean ascending) {
+
+    public List<Book> sortBooksByTitle(List<Book> bookList, boolean ascending, SortType sortType) {
         List<Book> sortedList = new ArrayList<>(bookList);
         Comparator<Book> comp = Comparator.comparing(Book::getTitle, String.CASE_INSENSITIVE_ORDER);
         if (!ascending)
             comp = comp.reversed();
-        GenericSort.insertionSort(sortedList, comp);
+        if (sortType == SortType.SELECTION) {
+            GenericSort.selectionSort(sortedList, comp);
+        } else {
+            GenericSort.insertionSort(sortedList, comp);
+        }
         return sortedList;
     }
 
-    public List<Book> sortBooksByAuthor(List<Book> bookList, boolean ascending) {
+    public List<Book> sortBooksByAuthor(List<Book> bookList, boolean ascending, SortType sortType) {
         List<Book> sortedList = new ArrayList<>(bookList);
         Comparator<Book> comp = Comparator.comparing(Book::getAuthor, String.CASE_INSENSITIVE_ORDER);
         if (!ascending)
             comp = comp.reversed();
-        GenericSort.insertionSort(sortedList, comp);
+        if (sortType == SortType.SELECTION) {
+            GenericSort.selectionSort(sortedList, comp);
+        } else {
+            GenericSort.insertionSort(sortedList, comp);
+        }
         return sortedList;
     }
 
-    public List<Book> sortBooksByPrice(List<Book> bookList, boolean ascending) {
+    public List<Book> sortBooksByPrice(List<Book> bookList, boolean ascending, SortType sortType) {
         List<Book> sortedList = new ArrayList<>(bookList);
         Comparator<Book> comp = Comparator.comparingDouble(Book::getPrice);
         if (!ascending)
             comp = comp.reversed();
-        GenericSort.insertionSort(sortedList, comp);
+        if (sortType == SortType.SELECTION) {
+            GenericSort.selectionSort(sortedList, comp);
+        } else {
+            GenericSort.insertionSort(sortedList, comp);
+        }
         return sortedList;
     }
 
-    public List<Book> sortBooksByPublishedDate(List<Book> bookList, boolean ascending) {
+    public List<Book> sortBooksByPublishedDate(List<Book> bookList, boolean ascending, SortType sortType) {
         List<Book> sortedList = new ArrayList<>(bookList);
         Comparator<Book> comp = Comparator.comparing(Book::getPublishedDate);
         if (!ascending)
             comp = comp.reversed();
-        GenericSort.insertionSort(sortedList, comp);
+        if (sortType == SortType.SELECTION) {
+            GenericSort.selectionSort(sortedList, comp);
+        } else {
+            GenericSort.insertionSort(sortedList, comp);
+        }
         return sortedList;
     }
 

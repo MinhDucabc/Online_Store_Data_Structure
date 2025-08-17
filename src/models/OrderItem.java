@@ -31,6 +31,6 @@ public class OrderItem {
 
     @Override
     public String toString() {
-        return book.getTitle() + " x" + quantity + " = " + getTotal();
+        return book.getTitle() + " x" + quantity + " = $" + String.format("%.2f", getTotal());
     }
 }

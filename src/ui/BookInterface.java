@@ -1,8 +1,16 @@
 package ui;
 
 import models.Book;
+import models.Customer; // Add this import
+import services.AuthenticationInterface;
+import services.AuthService;
 import services.BookService;
 import services.User.CartService;
+import services.User.OrderService;
+import services.checkout.CheckoutService;
+
+import algorithms.GenericSearch.SearchType;
+import algorithms.GenericSort.SortType;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -13,21 +21,52 @@ import java.util.Set;
 
 public class BookInterface {
     public static class BookListUI extends JFrame {
+        private AuthService authService;
         private BookService bookService;
         private CartService cartService;
+        private OrderService orderService; // Thêm OrderService
 
+        private Customer currentCustomer; // Biến toàn cục để lưu thông tin khách hàng
+        private JButton authBtn, profileBtn, logoutBtn;
         private JList<String> categoryList;
         private JPanel bookPanel;
         private JTextField searchField;
         private JComboBox<String> sortCombo;
         private JComboBox<String> orderCombo; // Thay thế ascCheckBox bằng orderCombo
+        private SearchType currentSearchType = SearchType.LINEAR; // Biến toàn cục để lưu search type
+        private SortType currentSortType = SortType.INSERTION; // Biến toàn cục để lưu sort type
+        private JLabel welcomeLabel; // Thêm biến toàn cục cho welcome label
 
         public BookListUI() {
             bookService = new BookService();
             cartService = new CartService();
+            authService = new AuthService();
+            orderService = new OrderService();
             initUI();
             loadCategories();
             loadBooks(bookService.getAllBooks());
+        }
+
+        private void updateWelcomeLabel(Customer customer, JLabel welcomeLabel) {
+            if (customer != null) {
+                welcomeLabel.setText("Welcome, " + customer.getName());
+            } else {
+                welcomeLabel.setText("Not logged in");
+            }
+        }
+
+        private void setVisiblewhenAuthChanged(Customer customer, JButton profileBtn, JButton logoutBtn,
+                JButton authBtn) {
+            currentCustomer = customer;
+            if (currentCustomer != null) {
+                profileBtn.setVisible(true);
+                logoutBtn.setVisible(true);
+                authBtn.setVisible(false);
+            } else {
+                profileBtn.setVisible(false);
+                logoutBtn.setVisible(false);
+                authBtn.setVisible(true);
+            }
         }
 
         private void initUI() {
@@ -52,29 +91,61 @@ public class BookInterface {
             navbarPanel.setBackground(new Color(240, 240, 240));
             navbarPanel.add(new JLabel("📚 Online Book Store"));
 
-            // Nút View Cart trên navbar
-            JButton viewCartButton = new JButton("🛒 View Cart");
-            viewCartButton.addActionListener(e -> new CartUI(cartService).setVisible(true));
-            navbarPanel.add(viewCartButton);
-
             // Top filter panel
-            JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-            topPanel.add(new JLabel("Search:"));
+            JPanel topPanel = new JPanel();
+            topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
+
+            // Search row
+            JPanel searchRow = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            searchRow.add(new JLabel("Search:"));
             searchField = new JTextField(15);
-            topPanel.add(searchField);
+            searchRow.add(searchField);
 
             JButton searchButton = new JButton("Search");
             searchButton.addActionListener(e -> applySearchAndSort());
-            topPanel.add(searchButton);
+            searchRow.add(searchButton);
 
-            topPanel.add(new JLabel("Sort by:"));
-            sortCombo = new JComboBox<>(new String[] { "--Select--", "Title", "Author", "Price", "Date" });
+            JComboBox<String> searchTypeCombo = new JComboBox<>(new String[] {
+                    SearchType.LINEAR.name(),
+                    SearchType.BINARY_TREE.name()
+            });
+
+            searchTypeCombo.addActionListener(e -> {
+                String selectedSearchType = (String) searchTypeCombo.getSelectedItem();
+                currentSearchType = SearchType.valueOf(selectedSearchType);
+            });
+
+            searchRow.add(new JLabel("Search Type:"));
+            searchRow.add(searchTypeCombo);
+
+            // Sort row
+            JPanel sortRow = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            sortRow.add(new JLabel("Sort by:"));
+            sortCombo = new JComboBox<>(new String[] { "Title", "Author", "Price", "Date" });
+            sortCombo.setSelectedIndex(0);
             sortCombo.addActionListener(e -> applySearchAndSort());
-            topPanel.add(sortCombo);
+            sortRow.add(sortCombo);
 
             orderCombo = new JComboBox<>(new String[] { "Ascending", "Descending" });
             orderCombo.addActionListener(e -> applySearchAndSort());
-            topPanel.add(orderCombo);
+            sortRow.add(orderCombo);
+
+            JComboBox<String> sortTypeCombo = new JComboBox<>(new String[] {
+                    SortType.INSERTION.name(),
+                    SortType.SELECTION.name(),
+            });
+            sortTypeCombo.addActionListener(e -> {
+                String selectedSortType = (String) sortTypeCombo.getSelectedItem();
+                currentSortType = SortType.valueOf(selectedSortType);
+                applySearchAndSort();
+            });
+
+            sortRow.add(new JLabel("Sort Type:"));
+            sortRow.add(sortTypeCombo);
+
+            // Add rows to topPanel
+            topPanel.add(searchRow);
+            topPanel.add(sortRow);
 
             // Add navbar and topPanel to rightPanel
             JPanel topContainer = new JPanel();
@@ -84,7 +155,102 @@ public class BookInterface {
 
             rightPanel.add(topContainer, BorderLayout.NORTH);
 
-            rightPanel.add(topPanel, BorderLayout.NORTH);
+            // Giỏ hàng icon
+            JButton cartBtn = new JButton("🛒 Cart");
+            cartBtn.addActionListener(e -> {
+                if (!authService.isLoggedIn()) {
+                    JOptionPane.showMessageDialog(this,
+                            "⚠️ Please login first to access your cart!",
+                            "Not Logged In", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                if (currentCustomer == null) {
+                    JOptionPane.showMessageDialog(this,
+                            "⚠️ Customer information not found!",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                CartInterface cartInterface = new CartInterface(
+                        cartService,
+                        bookService,
+                        orderService,
+                        currentCustomer,
+                        () -> loadBooks(bookService.getAllBooks()) // Add reload callback
+                );
+                cartInterface.setVisible(true);
+            });
+
+            navbarPanel.add(cartBtn);
+
+            // Khoi tao cac nut
+            profileBtn = new JButton("👤 Profile");
+            logoutBtn = new JButton("🚪 Logout");
+            authBtn = new JButton("🔑 Authentication");
+
+            // Nút Authentication
+            authBtn.addActionListener(e -> {
+                AuthenticationInterface authUI = new AuthenticationInterface(authService, cartService, customer -> {
+                    currentCustomer = customer;
+                    updateWelcomeLabel(currentCustomer, welcomeLabel);
+                    setVisiblewhenAuthChanged(currentCustomer, profileBtn, logoutBtn, authBtn); // Cập nhật giao diện
+                                                                                                // khi đăng nhập
+                });
+                authUI.setVisible(true);
+            });
+            navbarPanel.add(authBtn);
+
+            // Nut Profile
+            profileBtn.addActionListener(e -> {
+                if (!authService.isLoggedIn()) {
+                    JOptionPane.showMessageDialog(this,
+                            "⚠️ Please login first to view your profile!",
+                            "Not Logged In", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                currentCustomer = authService.getLoggedInCustomer();
+                if (currentCustomer == null) {
+                    JOptionPane.showMessageDialog(this,
+                            "⚠️ Customer information not found!",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                ProfileUI profileUI = new ProfileUI(currentCustomer, orderService);
+                profileUI.setVisible(true);
+            });
+            navbarPanel.add(profileBtn);
+
+            // Welcome label
+            welcomeLabel = new JLabel();
+            welcomeLabel.setFont(new Font("Arial", Font.BOLD, 14));
+            updateWelcomeLabel(currentCustomer, welcomeLabel);
+            navbarPanel.add(welcomeLabel);
+
+            // ==== Nút Logout ====
+            logoutBtn.addActionListener(e -> {
+                if (!authService.isLoggedIn()) {
+                    JOptionPane.showMessageDialog(this,
+                            "⚠️ You are not logged in!",
+                            "Logout", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                authService.logout(cartService);
+                currentCustomer = null;
+                updateWelcomeLabel(null, welcomeLabel);
+                setVisiblewhenAuthChanged(null, profileBtn, logoutBtn, authBtn); // Cập nhật giao diện khi đăng xuất
+
+                JOptionPane.showMessageDialog(this,
+                        "✅ You have been logged out successfully!",
+                        "Logout", JOptionPane.INFORMATION_MESSAGE);
+            });
+            navbarPanel.add(logoutBtn);
+
+            // Cap nhat trang thai hien thi khi dang nhap/khong dang nhap
+            setVisiblewhenAuthChanged(currentCustomer, profileBtn, logoutBtn, authBtn);
 
             // Book display panel (cards)
             bookPanel = new JPanel();
@@ -113,50 +279,65 @@ public class BookInterface {
             for (Book book : books) {
                 JPanel card = new JPanel(new BorderLayout());
                 card.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-                card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120)); // chiều cao cố định
+                card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 150));
 
-                // Hiển thị ảnh thật từ Book (nếu có), nếu không thì dùng placeholder
+                // ========== IMAGE ==========
                 JLabel imageLabel;
-
                 File file = new File(book.getImage());
-                System.out.println("Loading image for book: " + book.getTitle() + " from " + file.getAbsolutePath());
                 if (file.exists()) {
                     ImageIcon icon = new ImageIcon(file.getAbsolutePath());
                     Image img = icon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
                     imageLabel = new JLabel(new ImageIcon(img), SwingConstants.CENTER);
                 } else {
                     imageLabel = new JLabel("📖", SwingConstants.CENTER);
-                    System.out.println("Image not found for book: " + book.getTitle());
                 }
                 imageLabel.setPreferredSize(new Dimension(100, 100));
-                imageLabel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
                 card.add(imageLabel, BorderLayout.WEST);
 
-                // Thông tin sách
+                // ========== INFO ==========
                 JPanel infoPanel = new JPanel(new GridLayout(0, 1));
                 infoPanel.add(new JLabel("Title: " + book.getTitle()));
                 infoPanel.add(new JLabel("Author: " + book.getAuthor()));
                 infoPanel.add(new JLabel("Category: " + book.getCategory()));
-                infoPanel.add(new JLabel("Price: $" + book.getPrice()));
+                infoPanel.add(new JLabel("Price: $" + String.format("%.2f", book.getPrice())));
                 infoPanel.add(new JLabel("Published: " + book.getPublishedDate()));
+
                 card.add(infoPanel, BorderLayout.CENTER);
 
-                bookPanel.add(card);
+                // ========== ACTIONS (nút + combo số lượng) ==========
+                JPanel qtyPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+                qtyPanel.add(new JLabel("Quantity: " + book.getQuantity()));
 
-                // Drop down list hien thi so luong muon theo vao
-                JPanel details = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-                JComboBox<Integer> quantityCombo = new JComboBox<>();
-                for (int i = 1; i <= 10; i++) {
-                    quantityCombo.addItem(i);
+                JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
+                String[] qtyOptions = new String[book.getQuantity()];
+                for (int i = 0; i < book.getQuantity(); i++) {
+                    qtyOptions[i] = String.valueOf(i + 1);
                 }
+                JComboBox<String> qtyCombo = new JComboBox<>(qtyOptions);
 
-                JButton addToCartBtn = new JButton("Add to Cart");
-                addToCartBtn.addActionListener(ev -> {
-                    cartService.addToCart(book, (int) quantityCombo.getSelectedItem());
-                    JOptionPane.showMessageDialog(this, book.getTitle() + " added to cart!");
+                JButton addToCartBtn = new JButton("➕ Add to Cart");
+                addToCartBtn.addActionListener(e -> {
+                    if (!authService.isLoggedIn()) {
+                        JOptionPane.showMessageDialog(this,
+                                "⚠️ Please login first before adding items to cart!",
+                                "Not Logged In", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+
+                    int quantity = Integer.parseInt((String) qtyCombo.getSelectedItem());
+                    cartService.addToCart(book, quantity);
+                    JOptionPane.showMessageDialog(this,
+                            "✅ Added " + quantity + " × " + book.getTitle() + " to cart!");
                 });
-                details.add(addToCartBtn);
 
+                actionPanel.add(qtyPanel);
+                actionPanel.add(qtyCombo);
+                actionPanel.add(addToCartBtn);
+
+                card.add(actionPanel, BorderLayout.NORTH);
+
+                bookPanel.add(card);
             }
 
             bookPanel.revalidate();
@@ -175,35 +356,65 @@ public class BookInterface {
         // 2. Search + Sort (không động chạm tới category)
         private void applySearchAndSort() {
             String keyword = searchField.getText().trim();
+            String selectedCategory = categoryList.getSelectedValue();
 
-            // Tìm kiếm: có thể chọn search theo Title hoặc Author (ví dụ: mặc định là
-            // Title)
             List<Book> result;
+
+            long searchStart = System.nanoTime();
+
             if (!keyword.isEmpty()) {
-                // có thể nâng cấp: cho user chọn search mode (Title/Author)
-                result = bookService.searchByTitle(keyword);
-                result.addAll(bookService.searchByAuthor(keyword)); // gộp kết quả
+                if (currentSearchType == SearchType.LINEAR) {
+                    result = bookService.searchByTitle(keyword, SearchType.LINEAR, currentSortType);
+                    result.addAll(bookService.searchByAuthor(keyword, SearchType.LINEAR, currentSortType));
+                    if (selectedCategory != null && !selectedCategory.equals("All")) {
+                        result.removeIf(book -> !book.getCategory().equals(selectedCategory));
+                    }
+                } else {
+                    result = bookService.searchByTitle(keyword, SearchType.BINARY_TREE, currentSortType);
+                    result.addAll(bookService.searchByAuthor(keyword, SearchType.BINARY_TREE, currentSortType));
+                    if (selectedCategory != null && !selectedCategory.equals("All")) {
+                        result.removeIf(book -> !book.getCategory().equals(selectedCategory));
+                    }
+                }
             } else {
                 result = bookService.getAllBooks();
+                if (selectedCategory != null && !selectedCategory.equals("All")) {
+                    result.removeIf(book -> !book.getCategory().equals(selectedCategory));
+                }
             }
+
+            long searchEnd = System.nanoTime();
+            double searchMillis = (searchEnd - searchStart) / 1_000_000.0;
+
             Set<Book> resultSet = new java.util.HashSet<>(result);
             List<Book> resultList = new java.util.ArrayList<>(resultSet);
 
-            // Sort
             String sortField = (String) sortCombo.getSelectedItem();
             boolean ascending = orderCombo.getSelectedItem().equals("Ascending");
 
-            // Apply sorting to the result list
+            long sortStart = System.nanoTime();
+
             List<Book> sortedResult = switch (sortField) {
-                case "Title" -> bookService.sortBooksByTitle(resultList, ascending);
-                case "Author" -> bookService.sortBooksByAuthor(resultList, ascending);
-                case "Price" -> bookService.sortBooksByPrice(resultList, ascending);
-                case "Date" -> bookService.sortBooksByPublishedDate(resultList, ascending);
+                case "Title" -> bookService.sortBooksByTitle(resultList, ascending, currentSortType);
+                case "Author" -> bookService.sortBooksByAuthor(resultList, ascending, currentSortType);
+                case "Price" -> bookService.sortBooksByPrice(resultList, ascending, currentSortType);
+                case "Date" -> bookService.sortBooksByPublishedDate(resultList, ascending, currentSortType);
                 default -> resultList;
             };
 
+            long sortEnd = System.nanoTime();
+            double sortMillis = (sortEnd - sortStart) / 1_000_000.0;
+
+            // ===== 3. Hiển thị kết quả
+            JOptionPane.showMessageDialog(this,
+                    "Search Type: " + currentSearchType +
+                            "\nSort Type: " + currentSortType +
+                            "\nSearch Time: " + searchMillis + " ms" +
+                            "\nSort Time: " + sortMillis + " ms");
+
             loadBooks(sortedResult);
         }
+
     }
 
     public static void main(String[] args) {

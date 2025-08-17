@@ -15,7 +15,7 @@ public class BookData {
 
         BOOKS.add(new Book("Computer Networks", "Andrew S. Tanenbaum", 32.10f, 5,
             LocalDate.of(2011, 7, 21), "Networking",
-            null));
+            "images/Computer_Networks.jpg"));
 
         BOOKS.add(new Book("Artificial Intelligence: A Modern Approach", "Stuart Russell & Peter Norvig", 45.00f, 4,
             LocalDate.of(2020, 1, 15), "Artificial Intelligence",
@@ -23,7 +23,7 @@ public class BookData {
 
         BOOKS.add(new Book("The Pragmatic Programmer", "Andrew Hunt & David Thomas", 27.80f, 10,
             LocalDate.of(2019, 10, 20), "Software Engineering",
-            null));
+            "images/The_Pragmatic_Programmer.jpg"));
 
         BOOKS.add(new Book("Introduction to Algorithms", "Thomas H. Cormen", 40.00f, 6,
             LocalDate.of(2009, 7, 31), "Algorithms",
@@ -35,7 +35,7 @@ public class BookData {
 
         BOOKS.add(new Book("Design Patterns", "Erich Gamma et al.", 42.00f, 5,
             LocalDate.of(1994, 10, 31), "Software Engineering",
-            null));
+            "images/Design_Pattern.jpg"));
 
         BOOKS.add(new Book("Deep Learning", "Ian Goodfellow", 50.00f, 3,
             LocalDate.of(2016, 11, 18), "Artificial Intelligence",
@@ -47,7 +47,7 @@ public class BookData {
 
         BOOKS.add(new Book("Java: The Complete Reference", "Herbert Schildt", 45.00f, 8,
             LocalDate.of(2018, 4, 11), "Java",
-            null));
+            "images/Java_The_Complete_Reference_Thirteenth_Edition.jpg"));
 
         BOOKS.add(new Book("Python Crash Course", "Eric Matthes", 30.00f, 9,
             LocalDate.of(2019, 5, 3), "Python",
@@ -55,7 +55,7 @@ public class BookData {
 
         BOOKS.add(new Book("Fluent Python", "Luciano Ramalho", 48.00f, 4,
             LocalDate.of(2015, 7, 30), "Python",
-            null));
+            "images/Fluent_Python.jpg"));
 
         BOOKS.add(new Book("Head First Design Patterns", "Eric Freeman", 37.00f, 7,
             LocalDate.of(2004, 10, 25), "Software Engineering",
@@ -63,7 +63,7 @@ public class BookData {
 
         BOOKS.add(new Book("Introduction to Machine Learning", "Ethem Alpaydin", 42.50f, 5,
             LocalDate.of(2020, 2, 14), "Artificial Intelligence",
-            null));
+            "images/Introduction_to_Machine_Learning.jpg"));
 
         BOOKS.add(new Book("Cracking the Coding Interview", "Gayle Laakmann McDowell", 35.00f, 8,
             LocalDate.of(2015, 7, 1), "Algorithms",
@@ -71,7 +71,7 @@ public class BookData {
 
         BOOKS.add(new Book("Learning JavaScript Design Patterns", "Addy Osmani", 28.00f, 6,
             LocalDate.of(2012, 8, 30), "Web Development",
-            null));
+            "images/Learning_JavaScript_Design_Patterns.jpg"));
 
         BOOKS.add(new Book("You Don't Know JS Yet", "Kyle Simpson", 25.00f, 10,
             LocalDate.of(2020, 1, 28), "Web Development",

@@ -104,6 +104,6 @@ public class AdminOrderManagementTest {
         adminService.getDoneOrders().forEach(Order::printOrderDetails);
 
         // === Admin logout ===
-        authService.logout();
+        authService.logout(null); // Không cần CartService khi logout admin
     }
 }

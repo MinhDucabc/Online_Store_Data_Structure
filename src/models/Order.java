@@ -3,6 +3,9 @@ package models;
 import models.OrderItem;
 import structures.orderstack.OrderStack;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,8 +33,14 @@ public class Order {
     public List<OrderItem> getItems() { return items; }
 
     // Tính tổng tiền
-    public double getTotalAmount() {
-        return items.stream().mapToDouble(OrderItem::getTotal).sum();
+    public BigDecimal getTotalAmount() {
+        BigDecimal total = BigDecimal.ZERO;
+        for (OrderItem item : items) {
+            BigDecimal price = BigDecimal.valueOf(item.getBook().getPrice());
+            BigDecimal quantity = BigDecimal.valueOf(item.getQuantity());
+            total = total.add(price.multiply(quantity));
+        }
+        return total.setScale(2, RoundingMode.HALF_UP);
     }
 
     // Status Management

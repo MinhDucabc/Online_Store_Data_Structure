@@ -94,7 +94,7 @@ public class Book {
                 "bookId=" + bookId +
                 ", title='" + title + '\'' +
                 ", author='" + author + '\'' +
-                ", price=" + price +
+                ", price=$" + String.format("%.2f", price) +
                 ", quantity=" + quantity +
                 ", publishedDate=" + publishedDate +
                 ", category='" + category + '\'' +
