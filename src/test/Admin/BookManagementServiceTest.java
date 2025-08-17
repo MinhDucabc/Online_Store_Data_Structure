@@ -10,9 +10,9 @@ public class BookManagementServiceTest {
         BookManagementService service = new BookManagementService();
 
         // 1. Them sach
-        service.addBook(new Book("Java Programming", "John Smith", 150000.0, 5, LocalDate.of(2022, 1, 1), "Programming"));
-        service.addBook(new Book("Advanced Algorithms", "Michael Brown", 200000.0, 3, LocalDate.of(2021, 6, 15), "Algorithms"));
-        service.addBook(new Book("Database Fundamentals", "David Johnson", 180000.0, 4, LocalDate.of(2020, 3, 10), "Database"));
+        service.addBook(new Book("Java Programming", "John Smith", 150000.0, 5, LocalDate.of(2022, 1, 1), "Programming", null));
+        service.addBook(new Book("Advanced Algorithms", "Michael Brown", 200000.0, 3, LocalDate.of(2021, 6, 15), "Algorithms", null));
+        service.addBook(new Book("Database Fundamentals", "David Johnson", 180000.0, 4, LocalDate.of(2020, 3, 10), "Database", null));
 
         // 2. Lay toan bo sach
         System.out.println("\n--- Danh sach sach ---");

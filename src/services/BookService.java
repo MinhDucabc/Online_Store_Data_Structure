@@ -45,30 +45,41 @@ public class BookService {
         return GenericSearch.linearSearch(books, keyword, Book::getAuthor);
     }
 
-    public List<Book> searchByCategory(String keyword) {
-        return GenericSearch.linearSearch(books, keyword, Book::getCategory);
-    }
-
     // ===== 3. Sắp xếp sách =====
-    public void sortBooksByTitle(boolean ascending) {
+    public List<Book> sortBooksByTitle(List<Book> bookList, boolean ascending) {
+        List<Book> sortedList = new ArrayList<>(bookList);
         Comparator<Book> comp = Comparator.comparing(Book::getTitle, String.CASE_INSENSITIVE_ORDER);
         if (!ascending)
             comp = comp.reversed();
-        GenericSort.insertionSort(books, comp);
+        GenericSort.insertionSort(sortedList, comp);
+        return sortedList;
     }
 
-    public void sortBooksByPrice(boolean ascending) {
+    public List<Book> sortBooksByAuthor(List<Book> bookList, boolean ascending) {
+        List<Book> sortedList = new ArrayList<>(bookList);
+        Comparator<Book> comp = Comparator.comparing(Book::getAuthor, String.CASE_INSENSITIVE_ORDER);
+        if (!ascending)
+            comp = comp.reversed();
+        GenericSort.insertionSort(sortedList, comp);
+        return sortedList;
+    }
+
+    public List<Book> sortBooksByPrice(List<Book> bookList, boolean ascending) {
+        List<Book> sortedList = new ArrayList<>(bookList);
         Comparator<Book> comp = Comparator.comparingDouble(Book::getPrice);
         if (!ascending)
             comp = comp.reversed();
-        GenericSort.insertionSort(books, comp);
+        GenericSort.insertionSort(sortedList, comp);
+        return sortedList;
     }
 
-    public void sortBooksByPublishedDate(boolean ascending) {
+    public List<Book> sortBooksByPublishedDate(List<Book> bookList, boolean ascending) {
+        List<Book> sortedList = new ArrayList<>(bookList);
         Comparator<Book> comp = Comparator.comparing(Book::getPublishedDate);
         if (!ascending)
             comp = comp.reversed();
-        GenericSort.insertionSort(books, comp);
+        GenericSort.insertionSort(sortedList, comp);
+        return sortedList;
     }
 
     // ===== 4. Lấy sách theo ID =====
@@ -79,5 +90,33 @@ public class BookService {
                 .orElse(null);
     }
 
+    public List<Book> getBooksByIds(List<Integer> bookIds) {
+        List<Book> result = new ArrayList<>();
+        for (int id : bookIds) {
+            Book book = getBookById(id);
+            if (book != null) {
+                result.add(book);
+            }
+        }
+        return result;
+    }
 
+    // Get book by category
+    public List<Book> getBooksByCategory(String category) {
+        if (category == null || category.isEmpty()) {
+            return new ArrayList<>(books); // Trả về tất cả sách nếu không có category
+        }
+        return books.stream()
+                .filter(b -> b.getCategory().equalsIgnoreCase(category))
+                .toList();
+    }
+
+    // Get All Categories
+    public List<String> getAllCategories() {
+        return books.stream()
+                .map(Book::getCategory)
+                .distinct()
+                .sorted(String.CASE_INSENSITIVE_ORDER)
+                .toList();
+    }
 }
