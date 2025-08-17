@@ -7,12 +7,14 @@ public class User {
     protected String name;        // Tên
     protected String email;       // Email
     protected String phoneNumber; // Số điện thoại
+    protected String password;    // Mật khẩu
 
-    public User(String name, String email, String phoneNumber) {
+    public User(String name, String email, String phoneNumber, String password) {
         this.userId = count++;
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
+        this.password = password;
     }
 
     // Getter / Setter
@@ -27,4 +29,7 @@ public class User {
 
     public String getPhoneNumber() { return phoneNumber; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
+
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 }

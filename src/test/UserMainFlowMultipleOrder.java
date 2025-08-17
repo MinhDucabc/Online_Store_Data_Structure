@@ -4,12 +4,12 @@ import services.BookService;
 import services.User.CartService;
 import services.User.OrderService;
 import services.checkout.CheckoutService;
+import services.AuthService;
 
 import models.*;
 
-import java.util.*; // import đầy đủ Random, Set, HashSet, List
+import java.util.*; // import Random, Set, HashSet, List
 
-import data.UserData;
 import data.BookData;
 
 public class UserMainFlowMultipleOrder {
@@ -20,42 +20,51 @@ public class UserMainFlowMultipleOrder {
         BookService bookService = new BookService();
         CartService cartService = new CartService();
         OrderService orderService = new OrderService();
+        AuthService authService = new AuthService();
 
-        // 2️⃣ Lay customer mẫu
-        Customer customer = UserData.CUSTOMERS.get(0);
+        // 2️⃣ Đăng nhập với tư cách customer
+        System.out.println("\n=== ĐĂNG NHẬP CUSTOMER ===");
+        boolean loginSuccess = authService.login("alice@example.com", "alicepass");
+        if (!loginSuccess) {
+            System.out.println("❌ Không thể đăng nhập. Dừng chương trình.");
+            return;
+        }
+        Customer customer = authService.getLoggedInCustomer();
 
         Random rand = new Random(); // chỉ cần 1 random chung
 
-        boolean invalidOrder = false;
+        // 3️⃣ Tạo nhiều đơn hàng ngẫu nhiên
         for (int i = 0; i < nums_of_orders; i++) {
             Set<Book> picked = new HashSet<>();
+            boolean invalidOrder = false;
 
-            // số lượng sách được chọn ngẫu nhiên trong [min, max]
-            // Chon sach ngau nhien
-            int nums_picked = rand.nextInt(3) + 1; // 1-3 sách
+            // số lượng sách được chọn ngẫu nhiên trong [1, 3]
+            int nums_picked = rand.nextInt(3) + 1;
 
             while (picked.size() < nums_picked) {
                 Book randomBook = BookData.BOOKS.get(rand.nextInt(BookData.BOOKS.size()));
                 picked.add(randomBook);
             }
 
-            System.out.println("\n=== Nhung quyen sach da them ===");
+            System.out.println("\n=== Nhung quyen sach da them (Order " + (i+1) + ") ===");
             picked.forEach(b -> System.out.println(b.getTitle()));
-            
+
             System.out.println("\n=== THÊM SÁCH VÀO GIỎ HÀNG (Order " + (i+1) + ") ===");
             for (Book b : picked) {
-                int qty = rand.nextInt(2) + 1;
+                int qty = rand.nextInt(2) + 1; // chọn 1-2 quyển
                 if (qty > b.getQuantity() || qty <= 0) {
                     System.out.println("❌ Lỗi: " + b.getTitle() + " chỉ còn " + b.getQuantity() + " nhưng yêu cầu " + qty);
                     invalidOrder = true;
-                    break; // thoát vòng for (sách)
+                    break;
                 }
                 cartService.addToCart(b, qty);
                 System.out.println(b.getTitle() + " x " + qty);
             }
+
             if (invalidOrder) {
                 System.out.println("⚠️ Order " + (i+1) + " bị hủy do vượt quá số lượng tồn kho!");
-                continue; // tiep tuc vòng lặp order
+                cartService.clearCart(); // xoá giỏ tránh sót hàng
+                continue;
             }
 
             // Tồn kho trước checkout
@@ -87,10 +96,22 @@ public class UserMainFlowMultipleOrder {
             picked.forEach(b -> System.out.println(b.getTitle() + " còn: " + b.getQuantity()));
         }
 
-        // Kiểm tra toàn bộ đơn hàng của user
-        System.out.println("\n=== DANH SÁCH TOÀN BỘ ORDER ===");
-        List<Order> allOrders = orderService.getOrdersByCustomerId(customer.getUserId());
-        allOrders.forEach(Order::printOrderDetails);
+        // 7️⃣ Kiểm tra toàn bộ đơn hàng của user trong các queue
+        System.out.println("\n=== KIỂM TRA ORDER THEO TRẠNG THÁI ===");
+        System.out.println("📌 Pending Orders:");
+        orderService.getAllPendingOrdersByCustomerId(customer.getUserId())
+                    .forEach(Order::printOrderDetails);
 
+        System.out.println("📌 Processing Orders:");
+        orderService.getAllProcessingOrdersByCustomerId(customer.getUserId())
+                    .forEach(Order::printOrderDetails);
+
+        System.out.println("📌 Done Orders:");
+        orderService.getAllDoneOrdersByCustomerId(customer.getUserId())
+                    .forEach(Order::printOrderDetails);
+
+        // 8️⃣ Logout
+        System.out.println("\n=== LOGOUT ===");
+        authService.logout();
     }
 }

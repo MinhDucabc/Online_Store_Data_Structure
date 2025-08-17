@@ -10,8 +10,8 @@ public class CustomerManagementServiceTest {
         CustomerManagementService service = new CustomerManagementService();
 
         // 1. Them moi
-        service.addUser(new Customer("Chris Evans", "chris@example.com", "999-888-7777", "Boston, USA"));
-        service.addUser(new Admin("Tony Stark", "tony@avengers.com", "111-222-3333", "SuperAdmin"));
+        service.addUser(new Customer("Chris Evans", "chris@example.com", "999-888-7777", "chrisPassword", "Boston, USA"));
+        service.addUser(new Admin("Tony Stark", "tony@avengers.com", "111-222-3333", "tonyPassword", "SuperAdmin"));
 
         // 2. Lay toan bo Customer
 

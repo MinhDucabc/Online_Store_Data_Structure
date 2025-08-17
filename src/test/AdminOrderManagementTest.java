@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Random;
 
 import models.Order;
+import services.AuthService;
 import services.BookService;
 import services.Admin.OrderManagementService;
 import services.User.OrderService;
@@ -17,7 +18,17 @@ public class AdminOrderManagementTest {
     public static void main(String[] args) {
         // Gọi utility để tạo sẵn Orders
         OrderService orderService = new OrderService();
-        MultiUserMainFlowMultipleOrder.generateMultiOrdersfromMultiUsers(orderService);
+        AuthService authService = new AuthService();
+        MultiUserMainFlowMultipleOrder.generateMultiOrdersfromMultiUsers(orderService, authService);
+
+        // === Admin login ===
+        authService.toggleRole(); // Chuyển sang chế độ Admin
+        System.out.println("🔀 Đã chuyển sang chế độ Admin");
+        boolean isLoggedIn = authService.login("david@example.com", "davidpass");
+        if (!isLoggedIn) {
+            System.out.println("❌ Không thể đăng nhập admin. Thoát chương trình.");
+            return;
+        }
 
         List<Order> allOrders = new ArrayList<>(orderService.getAllOrders());
 
@@ -91,5 +102,8 @@ public class AdminOrderManagementTest {
 
         System.out.println("\n📋 Danh sách order hiện tại trong DONE:");
         adminService.getDoneOrders().forEach(Order::printOrderDetails);
+
+        // === Admin logout ===
+        authService.logout();
     }
 }

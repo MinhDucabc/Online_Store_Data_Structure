@@ -2,6 +2,7 @@ package ui;
 
 import models.Book;
 import services.BookService;
+import services.User.CartService;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -13,6 +14,8 @@ import java.util.Set;
 public class BookInterface {
     public static class BookListUI extends JFrame {
         private BookService bookService;
+        private CartService cartService;
+
         private JList<String> categoryList;
         private JPanel bookPanel;
         private JTextField searchField;
@@ -21,6 +24,7 @@ public class BookInterface {
 
         public BookListUI() {
             bookService = new BookService();
+            cartService = new CartService();
             initUI();
             loadCategories();
             loadBooks(bookService.getAllBooks());
@@ -43,6 +47,16 @@ public class BookInterface {
             // ===== RIGHT PANEL: Search + Sort + Book Cards =====
             JPanel rightPanel = new JPanel(new BorderLayout());
 
+            // ===== NAVBAR =====
+            JPanel navbarPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            navbarPanel.setBackground(new Color(240, 240, 240));
+            navbarPanel.add(new JLabel("📚 Online Book Store"));
+
+            // Nút View Cart trên navbar
+            JButton viewCartButton = new JButton("🛒 View Cart");
+            viewCartButton.addActionListener(e -> new CartUI(cartService).setVisible(true));
+            navbarPanel.add(viewCartButton);
+
             // Top filter panel
             JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
             topPanel.add(new JLabel("Search:"));
@@ -61,6 +75,14 @@ public class BookInterface {
             orderCombo = new JComboBox<>(new String[] { "Ascending", "Descending" });
             orderCombo.addActionListener(e -> applySearchAndSort());
             topPanel.add(orderCombo);
+
+            // Add navbar and topPanel to rightPanel
+            JPanel topContainer = new JPanel();
+            topContainer.setLayout(new BoxLayout(topContainer, BoxLayout.Y_AXIS));
+            topContainer.add(navbarPanel);
+            topContainer.add(topPanel);
+
+            rightPanel.add(topContainer, BorderLayout.NORTH);
 
             rightPanel.add(topPanel, BorderLayout.NORTH);
 
@@ -120,6 +142,21 @@ public class BookInterface {
                 card.add(infoPanel, BorderLayout.CENTER);
 
                 bookPanel.add(card);
+
+                // Drop down list hien thi so luong muon theo vao
+                JPanel details = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+                JComboBox<Integer> quantityCombo = new JComboBox<>();
+                for (int i = 1; i <= 10; i++) {
+                    quantityCombo.addItem(i);
+                }
+
+                JButton addToCartBtn = new JButton("Add to Cart");
+                addToCartBtn.addActionListener(ev -> {
+                    cartService.addToCart(book, (int) quantityCombo.getSelectedItem());
+                    JOptionPane.showMessageDialog(this, book.getTitle() + " added to cart!");
+                });
+                details.add(addToCartBtn);
+
             }
 
             bookPanel.revalidate();
