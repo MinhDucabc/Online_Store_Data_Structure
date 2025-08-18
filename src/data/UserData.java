@@ -19,7 +19,8 @@ public class UserData {
         CUSTOMERS.add(new Customer("Mr123", "mr123@gmail.com", "", "123456", ""));
 
         // Admins
-        ADMINS.add(new Admin("David Lee", "david@example.com", "111-222-3333", "davidpass", "Admin"));
-        ADMINS.add(new Admin("Emma Wilson", "emma@example.com", "444-555-6666", "emmapass", "Admin"));
+        ADMINS.add(new Admin("David Lee", "david@example.com", "111-222-3333", "davidpass", "", "Admin"));
+        ADMINS.add(new Admin("Emma Wilson", "emma@example.com", "444-555-6666", "emmapass", "", "Admin"));
+        ADMINS.add(new Admin("MrAdmin", "MrAdmin@gmail.com", "777-888-9999", "123456", "", "Admin"));
     }
 }

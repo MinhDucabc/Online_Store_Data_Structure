@@ -15,6 +15,7 @@ public class AuthenticationInterface extends JFrame {
     private JTextField emailField, nameField;
     private JPasswordField passwordField;
     private JLabel statusLabel;
+    private JCheckBox adminToggle;
 
     public interface AuthListener {
         void onAuthChanged(Customer customer);
@@ -76,6 +77,17 @@ public class AuthenticationInterface extends JFrame {
         registerPanel.add(new JLabel()); // filler
         registerPanel.add(registerBtn);
 
+        // Admin toggle
+        adminToggle = new JCheckBox("Register as Admin");
+        adminToggle.setToolTipText("Check to register as an Admin");
+        adminToggle.addActionListener(e -> {
+            authService.toggleRole();
+            boolean isAdmin = authService.isAdminMode();
+            registerBtn.setText(isAdmin ? "Register Admin" : "Register User");
+        });
+        registerPanel.add(new JLabel()); // filler
+        registerPanel.add(adminToggle);
+
         tabbedPane.addTab("Register", registerPanel);
 
         // ===== STATUS LABEL =====
@@ -89,15 +101,21 @@ public class AuthenticationInterface extends JFrame {
     private void handleLogin() {
         String email = emailField.getText().trim();
         String password = new String(passwordField.getPassword());
+        boolean isAdmin = true;
 
         if (email.isEmpty() || password.isEmpty()) {
             statusLabel.setText("⚠️ Email và Password không được để trống!");
             return;
         }
 
-        if (authService.login(email, password)) {
+        if (authService.login(email, password, isAdmin)) {
             statusLabel.setText("✅ Login successful!");
-            Customer loggedIn = authService.getLoggedInCustomer();
+            Customer loggedIn;
+            if (isAdmin) {
+                loggedIn = authService.getLoggedInAdmin();
+            } else {
+                loggedIn = authService.getLoggedInCustomer();
+            }
             if (authListener != null) authListener.onAuthChanged(loggedIn);
             dispose();
         } else {
@@ -110,6 +128,7 @@ public class AuthenticationInterface extends JFrame {
         String name = nameField.getText().trim();
         String email = registerEmailField.getText().trim();
         String password = new String(registerPasswordField.getPassword()).trim();
+        boolean isAdmin = authService.isAdminMode();
 
         if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
             statusLabel.setText("⚠️ All fields are required!");
@@ -124,8 +143,9 @@ public class AuthenticationInterface extends JFrame {
             return;
         }
 
-        if (authService.register(name, email, password)) {
-            statusLabel.setText("✅ Register successful!");
+
+        if (authService.register(name, email, password, isAdmin)) {
+            statusLabel.setText("✅ Register successful as " + (isAdmin ? "Admin" : "User") + "!");
         } else {
             statusLabel.setText("❌ Register failed!");
         }

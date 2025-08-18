@@ -10,6 +10,11 @@ public class Customer extends User {
     }
 
     // Getter / Setter riêng cho Customer
-    public String getAddress() { return address; }
-    public void setAddress(String address) { this.address = address; }
+    public String getAddress() {
+        return address != null ? address : "N/A";
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
 }

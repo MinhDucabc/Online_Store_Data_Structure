@@ -27,7 +27,9 @@ public class User {
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
-    public String getPhoneNumber() { return phoneNumber; }
+    public String getPhoneNumber() { 
+        return phoneNumber != null ? phoneNumber : "N/A"; 
+    }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
 
     public String getPassword() { return password; }

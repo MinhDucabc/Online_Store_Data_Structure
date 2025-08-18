@@ -32,6 +32,8 @@ public class ProfileUI extends JFrame {
         infoPanel.add(new JLabel("ID: " + customer.getUserId()));
         infoPanel.add(new JLabel("Name: " + customer.getName()));
         infoPanel.add(new JLabel("Email: " + customer.getEmail()));
+        infoPanel.add(new JLabel("Phone: " + customer.getPhoneNumber()));
+        infoPanel.add(new JLabel("Address: " + customer.getAddress()));
         mainPanel.add(infoPanel, BorderLayout.NORTH);
 
         // 🔹 Tab hiển thị orders

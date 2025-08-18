@@ -21,8 +21,8 @@ public class AuthService {
     }
 
     // ===== Register
-    public boolean register(String name, String email, String password) {
-        if (adminMode) {
+    public boolean register(String name, String email, String password, boolean isAdmin) {
+        if (isAdmin) {
             // Admin register
             for (Admin a : UserData.ADMINS) {
                 if (a.getEmail().equalsIgnoreCase(email)) {
@@ -30,7 +30,7 @@ public class AuthService {
                     return false;
                 }
             }
-            Admin newAdmin = new Admin(name, email, "N/A", password, "Admin");
+            Admin newAdmin = new Admin(name, email, "N/A", password, "","Admin");
             UserData.ADMINS.add(newAdmin);
             System.out.println("✅ Đăng ký Admin thành công: " + name);
             return true;
@@ -50,8 +50,9 @@ public class AuthService {
     }
 
     // ===== Login
-    public boolean login(String email, String password) {
-        if (adminMode) {
+    public boolean login(String email, String password, boolean isAdmin) {
+        if (isAdmin) {
+            adminMode = true; // Bật chế độ Admin
             for (Admin a : UserData.ADMINS) {
                 if (a.getEmail().equalsIgnoreCase(email) && a.getPassword().equals(password)) {
                     loggedInAdmin = a;
@@ -81,6 +82,7 @@ public class AuthService {
             loggedInCustomer = null;
         } else if (loggedInAdmin != null) {
             System.out.println("👋 Admin logged out: " + loggedInAdmin.getName());
+            adminMode = false;
             loggedInAdmin = null;
         } else {
             System.out.println("⚠️ Không có ai đang đăng nhập.");

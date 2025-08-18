@@ -27,6 +27,7 @@ public class BookInterface {
         private OrderService orderService; // Thêm OrderService
 
         private Customer currentCustomer; // Biến toàn cục để lưu thông tin khách hàng
+        private boolean isAdmin = false; // Biến toàn cục để lưu trạng thái Admin
         private JButton authBtn, profileBtn, logoutBtn;
         private JList<String> categoryList;
         private JPanel bookPanel;
@@ -49,7 +50,11 @@ public class BookInterface {
 
         private void updateWelcomeLabel(Customer customer, JLabel welcomeLabel) {
             if (customer != null) {
-                welcomeLabel.setText("Welcome, " + customer.getName());
+                if (isAdmin) {
+                    welcomeLabel.setText("Welcome, Admin " + customer.getName());
+                } else {
+                    welcomeLabel.setText("Welcome, " + customer.getName());
+                }
             } else {
                 welcomeLabel.setText("Not logged in");
             }
@@ -193,6 +198,7 @@ public class BookInterface {
             authBtn.addActionListener(e -> {
                 AuthenticationInterface authUI = new AuthenticationInterface(authService, cartService, customer -> {
                     currentCustomer = customer;
+                    isAdmin = authService.isAdminMode();
                     updateWelcomeLabel(currentCustomer, welcomeLabel);
                     setVisiblewhenAuthChanged(currentCustomer, profileBtn, logoutBtn, authBtn); // Cập nhật giao diện
                                                                                                 // khi đăng nhập
@@ -210,7 +216,7 @@ public class BookInterface {
                     return;
                 }
 
-                currentCustomer = authService.getLoggedInCustomer();
+                // currentCustomer = authService.getLoggedInCustomer();
                 if (currentCustomer == null) {
                     JOptionPane.showMessageDialog(this,
                             "⚠️ Customer information not found!",
