@@ -36,31 +36,65 @@ public class ProfileUI extends JFrame {
 
         // 🔹 Tab hiển thị orders
         JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.add("Pending Orders", createOrderTable(orderService.getAllPendingOrdersByCustomerId(customer.getUserId())));
-        tabbedPane.add("Processing Orders", createOrderTable(orderService.getAllProcessingOrdersByCustomerId(customer.getUserId())));
-        tabbedPane.add("Done Orders", createOrderTable(orderService.getAllDoneOrdersByCustomerId(customer.getUserId())));
-        tabbedPane.add("All Orders", createOrderTable(orderService.getAllOrdersByCustomerId(customer.getUserId())));
+        tabbedPane.add("Pending Orders", new JScrollPane(createOrderCards(
+                orderService.getAllPendingOrdersByCustomerId(customer.getUserId()))));
+        tabbedPane.add("Processing Orders", new JScrollPane(createOrderCards(
+                orderService.getAllProcessingOrdersByCustomerId(customer.getUserId()))));
+        tabbedPane.add("Done Orders", new JScrollPane(createOrderCards(
+                orderService.getAllDoneOrdersByCustomerId(customer.getUserId()))));
+        tabbedPane.add("All Orders", new JScrollPane(createOrderCards(
+                orderService.getAllOrdersByCustomerId(customer.getUserId()))));
 
         mainPanel.add(tabbedPane, BorderLayout.CENTER);
 
         add(mainPanel);
     }
 
-    private JScrollPane createOrderTable(List<Order> orders) {
-        String[] columnNames = {"Order ID", "Book Title", "Quantity", "Price", "Status"};
-        DefaultTableModel model = new DefaultTableModel(columnNames, 0);
+    private JPanel createOrderCards(List<Order> orders) {
+        JPanel cardContainer = new JPanel();
+        cardContainer.setLayout(new BoxLayout(cardContainer, BoxLayout.Y_AXIS));
 
         for (Order o : orders) {
-            model.addRow(new Object[]{
-                    o.getOrderId(),
-                    o.getItems().stream().map(item -> item.getBook().getTitle()).reduce((a, b) -> a + ", " + b).orElse(""),
-                    o.getItems().stream().mapToInt(item -> item.getQuantity()).sum(),
-                    o.getTotalAmount(),
-                    o.getCurrentStatus(),
-            });
+            JPanel card = new JPanel(new BorderLayout());
+            card.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createEmptyBorder(10, 10, 10, 10),
+                    BorderFactory.createLineBorder(Color.GRAY, 1)));
+            card.setBackground(Color.WHITE);
+            card.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200)); // hạn chế chiều cao card
+
+            // 🔹 Tiêu đề order
+            JLabel orderLabel = new JLabel("Order #" + o.getOrderId() + " - Status: " + o.getCurrentStatus());
+            orderLabel.setFont(orderLabel.getFont().deriveFont(Font.BOLD, 14f));
+            card.add(orderLabel, BorderLayout.NORTH);
+
+            // 🔹 Panel hiển thị items (có scroll riêng cho từng order)
+            JPanel itemsPanel = new JPanel();
+            itemsPanel.setLayout(new BoxLayout(itemsPanel, BoxLayout.Y_AXIS));
+
+            for (var item : o.getItems()) {
+                itemsPanel.add(new JLabel("- " + item.getBook().getTitle()
+                        + " (x" + item.getQuantity() + ")"
+                        + " - $" + item.getBook().getPrice()));
+            }
+
+            JScrollPane itemsScroll = new JScrollPane(itemsPanel);
+            itemsScroll.setPreferredSize(new Dimension(600, 100)); // giới hạn kích thước hiển thị
+            itemsScroll.getVerticalScrollBar().setUnitIncrement(12);
+
+            card.add(itemsScroll, BorderLayout.CENTER);
+
+            // 🔹 Tổng tiền
+            JLabel totalLabel = new JLabel("Total: $" + o.getTotalAmount());
+            totalLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+            totalLabel.setFont(totalLabel.getFont().deriveFont(Font.BOLD));
+            card.add(totalLabel, BorderLayout.SOUTH);
+
+            // add card vào container
+            cardContainer.add(card);
+            cardContainer.add(Box.createRigidArea(new Dimension(0, 10)));
         }
 
-        JTable table = new JTable(model);
-        return new JScrollPane(table);
+        return cardContainer;
     }
+
 }
