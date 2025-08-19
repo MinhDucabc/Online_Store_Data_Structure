@@ -77,7 +77,7 @@ public class BookService {
             comp = comp.reversed();
         if (sortType == SortType.SELECTION) {
             GenericSort.selectionSort(sortedList, comp);
-        } else {
+        } else if (sortType == SortType.INSERTION) {
             GenericSort.insertionSort(sortedList, comp);
         }
         return sortedList;
@@ -90,7 +90,7 @@ public class BookService {
             comp = comp.reversed();
         if (sortType == SortType.SELECTION) {
             GenericSort.selectionSort(sortedList, comp);
-        } else {
+        } else if (sortType == SortType.INSERTION) {
             GenericSort.insertionSort(sortedList, comp);
         }
         return sortedList;
@@ -103,7 +103,7 @@ public class BookService {
             comp = comp.reversed();
         if (sortType == SortType.SELECTION) {
             GenericSort.selectionSort(sortedList, comp);
-        } else {
+        } else if (sortType == SortType.INSERTION) {
             GenericSort.insertionSort(sortedList, comp);
         }
         return sortedList;
@@ -116,7 +116,7 @@ public class BookService {
             comp = comp.reversed();
         if (sortType == SortType.SELECTION) {
             GenericSort.selectionSort(sortedList, comp);
-        } else {
+        } else if (sortType == SortType.INSERTION) {
             GenericSort.insertionSort(sortedList, comp);
         }
         return sortedList;

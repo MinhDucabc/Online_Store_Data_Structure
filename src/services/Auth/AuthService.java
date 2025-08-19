@@ -1,4 +1,4 @@
-package services;
+package services.Auth;
 
 import data.UserData;
 import models.Admin;
@@ -32,6 +32,7 @@ public class AuthService {
             }
             Admin newAdmin = new Admin(name, email, "N/A", password, "","Admin");
             UserData.ADMINS.add(newAdmin);
+            adminMode = false; // Reset to default user mode after registration
             System.out.println("✅ Đăng ký Admin thành công: " + name);
             return true;
         } else {
@@ -44,35 +45,32 @@ public class AuthService {
             }
             Customer newCustomer = new Customer(name, email, "N/A", password, "Unknown");
             UserData.CUSTOMERS.add(newCustomer);
+            adminMode = false; // Reset to default user mode after registration
             System.out.println("✅ Đăng ký Customer thành công: " + name);
             return true;
         }
     }
 
     // ===== Login
-    public boolean login(String email, String password, boolean isAdmin) {
-        if (isAdmin) {
-            adminMode = true; // Bật chế độ Admin
-            for (Admin a : UserData.ADMINS) {
-                if (a.getEmail().equalsIgnoreCase(email) && a.getPassword().equals(password)) {
-                    loggedInAdmin = a;
-                    System.out.println("🔑 Admin đăng nhập thành công: " + a.getName());
-                    return true;
-                }
+    public boolean login(String email, String password) {
+        for (Admin a : UserData.ADMINS) {
+            if (a.getEmail().equalsIgnoreCase(email) && a.getPassword().equals(password)) {
+            loggedInAdmin = a;
+            adminMode = true;
+            System.out.println("🔑 Admin đăng nhập thành công: " + a.getName());
+            return true;
             }
-            System.out.println("❌ Sai email hoặc mật khẩu (Admin).");
-            return false;
-        } else {
-            for (Customer c : UserData.CUSTOMERS) {
-                if (c.getEmail().equalsIgnoreCase(email) && c.getPassword().equals(password)) {
-                    loggedInCustomer = c;
-                    System.out.println("🔑 Customer đăng nhập thành công: " + c.getName());
-                    return true;
-                }
-            }
-            System.out.println("❌ Sai email hoặc mật khẩu (Customer).");
-            return false;
         }
+        for (Customer c : UserData.CUSTOMERS) {
+            if (c.getEmail().equalsIgnoreCase(email) && c.getPassword().equals(password)) {
+            loggedInCustomer = c;
+            adminMode = false;
+            System.out.println("🔑 Customer đăng nhập thành công: " + c.getName());
+            return true;
+            }
+        }
+        System.out.println("❌ Sai email hoặc mật khẩu.");
+        return false;
     }
 
     // ===== Logout =====

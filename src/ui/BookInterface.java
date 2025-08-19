@@ -2,13 +2,18 @@ package ui;
 
 import models.Book;
 import models.Customer; // Add this import
-import services.AuthenticationInterface;
-import services.AuthService;
+
+import services.Auth.AuthService;
 import services.BookService;
+import services.Admin.OrderManagementService;
+import services.Admin.CustomerManagementService;
+import services.Admin.BookManagementService;
 import services.User.CartService;
 import services.User.OrderService;
 import services.checkout.CheckoutService;
-
+import structures.orderqueuedone.OrderQueueDone;
+import structures.orderqueuepending.OrderQueuePending;
+import structures.orderqueueprocessing.OrderQueueProcessing;
 import algorithms.GenericSearch.SearchType;
 import algorithms.GenericSort.SortType;
 
@@ -25,6 +30,10 @@ public class BookInterface {
         private BookService bookService;
         private CartService cartService;
         private OrderService orderService; // Thêm OrderService
+
+        private OrderManagementService orderManagementService; // Thêm OrderManagementService
+        private CustomerManagementService customerService; // Thêm CustomerService
+        private BookManagementService bookManagementService; // Thêm BookManagementService
 
         private Customer currentCustomer; // Biến toàn cục để lưu thông tin khách hàng
         private boolean isAdmin = false; // Biến toàn cục để lưu trạng thái Admin
@@ -43,6 +52,18 @@ public class BookInterface {
             cartService = new CartService();
             authService = new AuthService();
             orderService = new OrderService();
+
+            OrderQueuePending orderQueuePending = new OrderQueuePending();
+            OrderQueueProcessing orderQueueProcessing = new OrderQueueProcessing();
+            OrderQueueDone orderQueueDone = new OrderQueueDone();
+
+            orderManagementService = new OrderManagementService(
+                orderQueuePending,
+                orderQueueProcessing,
+                orderQueueDone
+            );
+            customerService = new CustomerManagementService();
+            bookManagementService = new BookManagementService();
             initUI();
             loadCategories();
             loadBooks(bookService.getAllBooks());
@@ -234,6 +255,16 @@ public class BookInterface {
             welcomeLabel.setFont(new Font("Arial", Font.BOLD, 14));
             updateWelcomeLabel(currentCustomer, welcomeLabel);
             navbarPanel.add(welcomeLabel);
+
+            // Nut Admin
+            if (true) {
+                JButton adminBtn = new JButton("⚙️ Admin Panel");
+                adminBtn.addActionListener(e -> {
+                    AdminInterface adminUI = new AdminInterface(orderManagementService, customerService, bookManagementService);
+                    adminUI.setVisible(true);
+                });
+                navbarPanel.add(adminBtn);
+            }
 
             // ==== Nút Logout ====
             logoutBtn.addActionListener(e -> {

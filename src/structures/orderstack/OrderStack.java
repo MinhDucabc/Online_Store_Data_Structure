@@ -15,6 +15,11 @@ public class OrderStack {
         statusHistory.push(status);
     }
 
+    // Lấy lịch sử trạng thái
+    public Stack<String> getStatusHistory() {
+        return statusHistory;
+    }
+
     // Lấy trạng thái hiện tại
     public String currentStatus() {
         return statusHistory.isEmpty() ? "Chưa có trạng thái" : statusHistory.peek();

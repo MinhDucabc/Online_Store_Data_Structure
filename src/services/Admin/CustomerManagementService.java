@@ -9,6 +9,11 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import algorithms.GenericSearch;
+import algorithms.GenericSearch.SearchType;
+import algorithms.GenericSort;
+import algorithms.GenericSort.SortType;
+
 public class CustomerManagementService {
     private List<User> customers; // Lưu cả Customer và Admin
 
@@ -70,19 +75,36 @@ public class CustomerManagementService {
     }
 
     // Tìm kiếm theo tên
-    public List<User> searchByName(String keyword) {
-        return customers.stream()
-                .filter(c -> c.getName().toLowerCase().contains(keyword.toLowerCase()))
-                .toList();
-    }
+    public List<User> searchByName(String keyword, SearchType searchType, SortType sortType) {
+        if (searchType == SearchType.LINEAR) {
+            return GenericSearch.linearSearch(customers, keyword, User::getName);
+        } else if (searchType == SearchType.BINARY_TREE) {
+            List<User> sortedUsers = sortUsersByName(customers, true, sortType);
+            return GenericSearch.binarySearchTree(
+                    sortedUsers,
+                    keyword,
+                    User::getName,
+                    String::compareToIgnoreCase
+            );
+        }
+        return new ArrayList<>();
+    }   
 
-    // Sắp xếp theo tên tăng dần
-    public void sortByNameAsc() {
-        customers.sort(Comparator.comparing(User::getName));
-    }
+    // Sắp xếp theo tên
+    public List<User> sortUsersByName(List<User> userList, boolean ascending, SortType sortType) {
+        List<User> sortedList = new ArrayList<>(userList);
+        Comparator<User> comp = Comparator.comparing(User::getName, String.CASE_INSENSITIVE_ORDER);
 
-    // Sắp xếp theo tên giảm dần
-    public void sortByNameDesc() {
-        customers.sort(Comparator.comparing(User::getName).reversed());
+        if (!ascending) {
+            comp = comp.reversed();
+        }
+
+        if (sortType == SortType.SELECTION) {
+            GenericSort.selectionSort(sortedList, comp);
+        } else if (sortType == SortType.INSERTION) {
+            GenericSort.insertionSort(sortedList, comp);
+        }
+
+        return sortedList;
     }
 }

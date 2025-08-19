@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Random;
 
 import models.Order;
-import services.AuthService;
+import services.Auth.AuthService;
 import services.BookService;
 import services.Admin.OrderManagementService;
 import services.User.OrderService;

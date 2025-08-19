@@ -107,4 +107,130 @@ public class OrderManagementService {
         }
     }
 
+    // Cập nhật trạng thái bất kỳ cho đơn hàng
+    public void updateStatus(int orderId, String newStatus) {
+        Order targetOrder = null;
+
+        // Tìm order trong Pending
+        for (Order o : orderQueuePending.getOrdersPending()) {
+            if (o.getOrderId() == orderId) {
+                targetOrder = o;
+                orderQueuePending.getOrdersPending().remove(o);
+                break;
+            }
+        }
+
+        // Nếu không tìm thấy trong Pending, tìm trong Processing
+        if (targetOrder == null) {
+            for (Order o : orderQueueProcessing.getOrdersProcessing()) {
+                if (o.getOrderId() == orderId) {
+                    targetOrder = o;
+                    orderQueueProcessing.getOrdersProcessing().remove(o);
+                    break;
+                }
+            }
+        }
+
+        // Nếu không tìm thấy trong Pending + Processing, check Done
+        if (targetOrder == null) {
+            for (Order o : orderQueueDone.getOrdersDone()) {
+                if (o.getOrderId() == orderId) {
+                    targetOrder = o;
+                    orderQueueDone.getOrdersDone().remove(o);
+                    break;
+                }
+            }
+        }
+
+        // Nếu tìm thấy order, cập nhật trạng thái và chuyển queue
+        if (targetOrder != null) {
+            targetOrder.updateStatus(newStatus);
+
+            switch (newStatus.toLowerCase()) {
+                case "pending":
+                    orderQueuePending.enqueue(targetOrder);
+                    System.out.println("⏳ Đơn #" + orderId + " cập nhật sang PENDING");
+                    break;
+                case "processing":
+                    orderQueueProcessing.enqueue(targetOrder);
+                    System.out.println("🔄 Đơn #" + orderId + " cập nhật sang PROCESSING");
+                    break;
+                case "done":
+                    orderQueueDone.enqueue(targetOrder);
+                    System.out.println("✅ Đơn #" + orderId + " cập nhật sang DONE");
+                    break;
+                default:
+                    System.out.println("⚠️ Trạng thái không hợp lệ: " + newStatus);
+            }
+        } else {
+            System.out.println("❌ Không tìm thấy đơn hàng #" + orderId);
+        }
+    }
+
+    // Quay lại trạng thái trước đó của đơn hàng
+    public void UndoStatus(int orderId) {
+        Order targetOrder = null;
+
+        // Tìm order trong Pending
+        for (Order o : orderQueuePending.getOrdersPending()) {
+            if (o.getOrderId() == orderId) {
+                if (o.getStatusHistory().size() < 2) {
+                    System.out.println("❌ Không thể hoàn tác trạng thái cho đơn #" + orderId + " vì không có trạng thái trước đó.");
+                    return;
+                } else {
+                    targetOrder = o;
+                    orderQueuePending.getOrdersPending().remove(o);
+                    break;
+                }
+            }
+        }
+
+        // Nếu không tìm thấy trong Pending, tìm trong Processing
+        if (targetOrder == null) {
+            for (Order o : orderQueueProcessing.getOrdersProcessing()) {
+                if (o.getOrderId() == orderId) {
+                    targetOrder = o;
+                    orderQueueProcessing.getOrdersProcessing().remove(o);
+                    break;
+                }
+            }
+        }
+
+        // Nếu không tìm thấy trong Pending + Processing, check Done
+        if (targetOrder == null) {
+            for (Order o : orderQueueDone.getOrdersDone()) {
+                if (o.getOrderId() == orderId) {
+                    targetOrder = o;
+                    orderQueueDone.getOrdersDone().remove(o);
+                    break;
+                }
+            }
+        }
+
+        // Nếu tìm thấy order và có trạng thái trước đó
+        if (targetOrder != null) {
+            String removedStatus = targetOrder.undoStatus();
+            String prevStatus = targetOrder.getCurrentStatus();
+
+            switch (prevStatus.toLowerCase()) {
+                case "pending":
+                    orderQueuePending.enqueue(targetOrder);
+                    System.out.println("⏪ Đơn #" + orderId + " quay lại trạng thái PENDING");
+                    break;
+                case "processing":
+                    orderQueueProcessing.enqueue(targetOrder);
+                    System.out.println("⏪ Đơn #" + orderId + " quay lại trạng thái PROCESSING");
+                    break;
+                case "done":
+                    orderQueueDone.enqueue(targetOrder);
+                    System.out.println("⏪ Đơn #" + orderId + " quay lại trạng thái DONE");
+                    break;
+                default:
+                    System.out.println("⚠️ Trạng thái trước đó không hợp lệ: " + prevStatus);
+            }
+        } else {
+            System.out.println("❌ Không thể hoàn tác trạng thái cho đơn #" + orderId);
+        }
+    }
+
 }

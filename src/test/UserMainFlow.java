@@ -4,7 +4,7 @@ import services.BookService;
 import services.User.CartService;
 import services.User.OrderService;
 import services.checkout.CheckoutService;
-import services.AuthService;
+import services.Auth.AuthService;
 
 import models.*;
 import data.BookData;

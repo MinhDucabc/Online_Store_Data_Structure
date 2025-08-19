@@ -2,6 +2,8 @@ package test.Admin;
 
 import java.time.LocalDate;
 
+import algorithms.GenericSearch.SearchType;
+import algorithms.GenericSort.SortType;
 import models.Book;
 import services.Admin.BookManagementService;
 
@@ -41,13 +43,59 @@ public class BookManagementServiceTest {
         service.deleteBook(1);
         service.getAllBooks().forEach(System.out::println);
 
-        // 6. Tim kiem theo tieu de
-        System.out.println("\n--- Tim kiem tu khoa 'Database' ---");
-        service.searchByTitle("Database").forEach(System.out::println);
+        // ====================== TEST SEARCH ======================
 
-        // 7. Sap xep theo gia tang dan
-        System.out.println("\n--- Sap xep theo gia tang dan ---");
-        service.sortByPriceAsc();
-        service.getAllBooks().forEach(System.out::println);
+        // 6. Tìm kiếm theo tiêu đề (Linear Search + Selection Sort)
+        System.out.println("\n--- Tìm kiếm theo tiêu đề (Database) ---");
+        service.searchByTitle("Database", SearchType.LINEAR, SortType.SELECTION)
+                .forEach(System.out::println);
+
+        // 7. Tìm kiếm theo tác giả (BinaryTree + Insertion Sort)
+        System.out.println("\n--- Tìm kiếm theo tác giả (John) ---");
+        service.searchByAuthor("John", SearchType.BINARY_TREE, SortType.INSERTION)
+                .forEach(System.out::println);
+
+        // ====================== TEST SORT ======================
+
+        // 8. Sắp xếp theo tiêu đề (A → Z, Selection Sort)
+        System.out.println("\n--- Sắp xếp theo tiêu đề tăng dần ---");
+        service.sortBooksByTitle(service.getAllBooks(), true, SortType.SELECTION)
+                .forEach(System.out::println);
+
+        // 9. Sắp xếp theo tiêu đề (Z → A, Insertion Sort)
+        System.out.println("\n--- Sắp xếp theo tiêu đề giảm dần ---");
+        service.sortBooksByTitle(service.getAllBooks(), false, SortType.INSERTION)
+                .forEach(System.out::println);
+
+        // 10. Sắp xếp theo tác giả (A → Z, Insertion Sort)
+        System.out.println("\n--- Sắp xếp theo tác giả tăng dần ---");
+        service.sortBooksByAuthor(service.getAllBooks(), true, SortType.INSERTION)
+                .forEach(System.out::println);
+
+        // 11. Sắp xếp theo tác giả (Z → A, Selection Sort)
+        System.out.println("\n--- Sắp xếp theo tác giả giảm dần ---");
+        service.sortBooksByAuthor(service.getAllBooks(), false, SortType.SELECTION)
+                .forEach(System.out::println);
+
+        // 12. Sắp xếp theo giá (Tăng dần, Selection Sort)
+        System.out.println("\n--- Sắp xếp theo giá tăng dần ---");
+        service.sortBooksByPrice(service.getAllBooks(), true, SortType.SELECTION)
+                .forEach(System.out::println);
+
+        // 13. Sắp xếp theo giá (Giảm dần, Insertion Sort)
+        System.out.println("\n--- Sắp xếp theo giá giảm dần ---");
+        service.sortBooksByPrice(service.getAllBooks(), false, SortType.INSERTION)
+                .forEach(System.out::println);
+
+        // 14. Sắp xếp theo ngày xuất bản (Cũ → Mới, Selection Sort)
+        System.out.println("\n--- Sắp xếp theo ngày xuất bản tăng dần ---");
+        service.sortBooksByPublishedDate(service.getAllBooks(), true, SortType.SELECTION)
+                .forEach(System.out::println);
+
+        // 15. Sắp xếp theo ngày xuất bản (Mới → Cũ, Insertion Sort)
+        System.out.println("\n--- Sắp xếp theo ngày xuất bản giảm dần ---");
+        service.sortBooksByPublishedDate(service.getAllBooks(), false, SortType.INSERTION)
+                .forEach(System.out::println);
+
     }
 }

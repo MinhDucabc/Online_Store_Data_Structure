@@ -1,6 +1,6 @@
 package ui;
 
-import services.AuthService;
+import services.Auth.AuthService;
 import services.User.CartService;
 import models.Customer;
 
@@ -101,17 +101,16 @@ public class AuthenticationInterface extends JFrame {
     private void handleLogin() {
         String email = emailField.getText().trim();
         String password = new String(passwordField.getPassword());
-        boolean isAdmin = true;
 
         if (email.isEmpty() || password.isEmpty()) {
             statusLabel.setText("⚠️ Email và Password không được để trống!");
             return;
         }
 
-        if (authService.login(email, password, isAdmin)) {
+        if (authService.login(email, password)) {
             statusLabel.setText("✅ Login successful!");
             Customer loggedIn;
-            if (isAdmin) {
+            if (authService.isAdminMode()) {
                 loggedIn = authService.getLoggedInAdmin();
             } else {
                 loggedIn = authService.getLoggedInCustomer();

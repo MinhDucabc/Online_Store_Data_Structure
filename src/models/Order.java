@@ -48,6 +48,10 @@ public class Order {
         statusStack.pushStatus(newStatus);
     }
 
+    public List<String> getStatusHistory() {
+        return statusStack.getStatusHistory();
+    }
+
     public String getCurrentStatus() {
         return statusStack.currentStatus();
     }

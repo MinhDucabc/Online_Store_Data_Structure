@@ -1,6 +1,6 @@
 package test;
 
-import services.AuthService;
+import services.Auth.AuthService;
 import models.Customer;
 import models.Admin;
 

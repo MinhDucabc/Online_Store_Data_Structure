@@ -1,5 +1,9 @@
 package test.Admin;
 
+import java.util.List;
+
+import algorithms.GenericSearch.SearchType;
+import algorithms.GenericSort.SortType;
 import models.Admin;
 import models.Customer;
 import models.User;
@@ -25,18 +29,20 @@ public class CustomerManagementServiceTest {
         User found = service.getUserById(2);
         System.out.println(found != null ? found.getName() : "Khong tim thay.");
 
-        // 4. Tim kiem theo ten
-        System.out.println("\n--- Tim kiem tu khoa 'John' ---");
-        service.searchByName("John").forEach(u -> 
+        // 4. Tìm kiếm theo tên
+        System.out.println("\n--- Tìm kiếm từ khóa 'John' ---");
+        service.searchByName("John", SearchType.LINEAR, SortType.INSERTION)
+            .forEach(u -> 
+                System.out.println(u.getUserId() + " - " + u.getName())
+            );
+
+        // 5. Sắp xếp theo tên tăng dần
+        System.out.println("\n--- Sắp xếp theo tên tăng dần ---");
+        List<User> sortedUsersAsc = service.sortUsersByName(service.getAllUsers(), true, SortType.INSERTION);
+        sortedUsersAsc.forEach(u -> 
             System.out.println(u.getUserId() + " - " + u.getName())
         );
 
-        // 5. Sap xep theo ten tang dan
-        System.out.println("\n--- Sap xep theo ten tang dan ---");
-        service.sortByNameAsc();
-        service.getAllUsers().forEach(u -> 
-            System.out.println(u.getUserId() + " - " + u.getName())
-        );
 
         // 6. Xoa nguoi dung
         System.out.println("\n--- Xoa nguoi dung ID = 1 ---");
