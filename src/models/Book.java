@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 public class Book {
     private static int counter = 1;
-    private final int bookId;
+    private int bookId;
     private String title;
     private String author;
     private double price;
@@ -60,6 +60,10 @@ public class Book {
     }
 
     // Setters
+    public void setBookId(int Id) {
+        this.bookId = Id;
+    }
+
     public void setTitle(String title) {
         this.title = title;
     }

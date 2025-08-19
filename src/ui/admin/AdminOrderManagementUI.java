@@ -4,6 +4,7 @@ import models.Order;
 import services.Admin.OrderManagementService;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
@@ -51,11 +52,19 @@ public class AdminOrderManagementUI extends JPanel {
         JButton btnProceed = new JButton("Proceed →");
         JButton btnUndo = new JButton("← Undo");
 
+        // New update controls
+        JComboBox<String> statusDropdown = new JComboBox<>();
+        JButton btnUpdate = new JButton("Update");
+
         controlPanel.add(btnRefresh);
         controlPanel.add(btnProceed);
         controlPanel.add(btnUndo);
+        controlPanel.add(new JLabel("Change status:"));
+        controlPanel.add(statusDropdown);
+        controlPanel.add(btnUpdate);
 
         btnRefresh.addActionListener(e -> loadOrders());
+
         btnProceed.addActionListener(e -> {
             int selectedRow = getCurrentTable(tabbedPane).getSelectedRow();
             if (selectedRow >= 0) {
@@ -78,6 +87,46 @@ public class AdminOrderManagementUI extends JPanel {
                 loadOrders();
             } else {
                 JOptionPane.showMessageDialog(this, "Please select an order first");
+            }
+        });
+
+        // Populate dropdown when row is selected
+        ListSelectionListener selectionListener = e -> {
+            if (!e.getValueIsAdjusting()) {
+                JTable currentTable = getCurrentTable(tabbedPane);
+                int selectedRow = currentTable.getSelectedRow();
+                statusDropdown.removeAllItems();
+                if (selectedRow >= 0) {
+                    DefaultTableModel model = getCurrentModel(tabbedPane);
+                    String currentStatus = (String) model.getValueAt(selectedRow, 3);
+
+                    // Example statuses
+                    String[] allStatuses = {"Pending", "Processing", "Done"};
+                    for (String status : allStatuses) {
+                        if (!status.equalsIgnoreCase(currentStatus)) {
+                            statusDropdown.addItem(status);
+                        }
+                    }
+                }
+            }
+        };
+
+        pendingTable.getSelectionModel().addListSelectionListener(selectionListener);
+        processingTable.getSelectionModel().addListSelectionListener(selectionListener);
+        doneTable.getSelectionModel().addListSelectionListener(selectionListener);
+        allTable.getSelectionModel().addListSelectionListener(selectionListener);
+
+        btnUpdate.addActionListener(e -> {
+            JTable currentTable = getCurrentTable(tabbedPane);
+            int selectedRow = currentTable.getSelectedRow();
+            if (selectedRow >= 0 && statusDropdown.getSelectedItem() != null) {
+                DefaultTableModel model = getCurrentModel(tabbedPane);
+                int orderId = (int) model.getValueAt(selectedRow, 0);
+                String newStatus = (String) statusDropdown.getSelectedItem();
+                orderService.updateStatus(orderId, newStatus);
+                loadOrders();
+            } else {
+                JOptionPane.showMessageDialog(this, "Please select an order and a status");
             }
         });
 

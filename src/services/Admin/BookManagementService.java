@@ -52,6 +52,7 @@ public class BookManagementService {
                 return true;
             }
         }
+        System.out.println("Khong tim thay sach ID: " + updatedBook.getBookId() + " de cap nhat.");
         return false;
     }
 

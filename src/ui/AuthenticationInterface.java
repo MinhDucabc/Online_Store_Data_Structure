@@ -153,7 +153,7 @@ public class AuthenticationInterface extends JFrame {
     // ✅ Handle Logout
     private void handleLogout() {
         if (authService.isLoggedIn()) {
-            authService.logout();
+            authService.logout(cartService);
             statusLabel.setText("✅ Logged out successfully!");
             if (authListener != null) authListener.onAuthChanged(null);
             dispose();

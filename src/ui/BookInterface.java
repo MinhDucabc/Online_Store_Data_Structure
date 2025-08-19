@@ -10,12 +10,12 @@ import services.Admin.CustomerManagementService;
 import services.Admin.BookManagementService;
 import services.User.CartService;
 import services.User.OrderService;
-import services.checkout.CheckoutService;
 import structures.orderqueuedone.OrderQueueDone;
 import structures.orderqueuepending.OrderQueuePending;
 import structures.orderqueueprocessing.OrderQueueProcessing;
 import algorithms.GenericSearch.SearchType;
 import algorithms.GenericSort.SortType;
+import services.checkout.CheckoutService;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -37,7 +37,7 @@ public class BookInterface {
 
         private Customer currentCustomer; // Biến toàn cục để lưu thông tin khách hàng
         private boolean isAdmin = false; // Biến toàn cục để lưu trạng thái Admin
-        private JButton authBtn, profileBtn, logoutBtn;
+        private JButton authBtn, profileBtn, logoutBtn, adminBtn; // Thêm biến toàn cục cho các nút
         private JList<String> categoryList;
         private JPanel bookPanel;
         private JTextField searchField;
@@ -82,15 +82,24 @@ public class BookInterface {
         }
 
         private void setVisiblewhenAuthChanged(Customer customer, JButton profileBtn, JButton logoutBtn,
-                JButton authBtn) {
+            JButton authBtn, JButton adminBtn) {
             currentCustomer = customer;
-            if (currentCustomer != null) {
+            
+            // First hide all buttons
+            profileBtn.setVisible(false);
+            logoutBtn.setVisible(false);
+            authBtn.setVisible(false);
+            adminBtn.setVisible(true);
+
+            if (customer != null) {  // User is logged in (either admin or customer)
                 profileBtn.setVisible(true);
-                logoutBtn.setVisible(true);
+                logoutBtn.setVisible(true);  // Show logout for both admin and customer
                 authBtn.setVisible(false);
-            } else {
-                profileBtn.setVisible(false);
-                logoutBtn.setVisible(false);
+                
+                if (isAdmin) {  // Additional admin button for admin users
+                    adminBtn.setVisible(true);
+                }
+            } else {  // No user logged in
                 authBtn.setVisible(true);
             }
         }
@@ -112,10 +121,14 @@ public class BookInterface {
             // ===== RIGHT PANEL: Search + Sort + Book Cards =====
             JPanel rightPanel = new JPanel(new BorderLayout());
 
+            // Above Navbar
+            JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            headerPanel.setBackground(new Color(240, 240, 240));
+            headerPanel.add(new JLabel("📚 Online Book Store"));
+
             // ===== NAVBAR =====
             JPanel navbarPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
             navbarPanel.setBackground(new Color(240, 240, 240));
-            navbarPanel.add(new JLabel("📚 Online Book Store"));
 
             // Top filter panel
             JPanel topPanel = new JPanel();
@@ -176,6 +189,7 @@ public class BookInterface {
             // Add navbar and topPanel to rightPanel
             JPanel topContainer = new JPanel();
             topContainer.setLayout(new BoxLayout(topContainer, BoxLayout.Y_AXIS));
+            topContainer.add(headerPanel);  
             topContainer.add(navbarPanel);
             topContainer.add(topPanel);
 
@@ -214,6 +228,7 @@ public class BookInterface {
             profileBtn = new JButton("👤 Profile");
             logoutBtn = new JButton("🚪 Logout");
             authBtn = new JButton("🔑 Authentication");
+            adminBtn = new JButton("⚙️ Admin Panel");
 
             // Nút Authentication
             authBtn.addActionListener(e -> {
@@ -221,7 +236,7 @@ public class BookInterface {
                     currentCustomer = customer;
                     isAdmin = authService.isAdminMode();
                     updateWelcomeLabel(currentCustomer, welcomeLabel);
-                    setVisiblewhenAuthChanged(currentCustomer, profileBtn, logoutBtn, authBtn); // Cập nhật giao diện
+                    setVisiblewhenAuthChanged(currentCustomer, profileBtn, logoutBtn, authBtn, adminBtn); // Cập nhật giao diện
                                                                                                 // khi đăng nhập
                 });
                 authUI.setVisible(true);
@@ -254,17 +269,14 @@ public class BookInterface {
             welcomeLabel = new JLabel();
             welcomeLabel.setFont(new Font("Arial", Font.BOLD, 14));
             updateWelcomeLabel(currentCustomer, welcomeLabel);
-            navbarPanel.add(welcomeLabel);
+            headerPanel.add(welcomeLabel);
 
             // Nut Admin
-            if (true) {
-                JButton adminBtn = new JButton("⚙️ Admin Panel");
-                adminBtn.addActionListener(e -> {
-                    AdminInterface adminUI = new AdminInterface(orderManagementService, customerService, bookManagementService);
-                    adminUI.setVisible(true);
-                });
-                navbarPanel.add(adminBtn);
-            }
+            adminBtn.addActionListener(e -> {
+                AdminInterface adminUI = new AdminInterface(orderManagementService, customerService, bookManagementService);
+                adminUI.setVisible(true);
+            });
+            navbarPanel.add(adminBtn);
 
             // ==== Nút Logout ====
             logoutBtn.addActionListener(e -> {
@@ -278,7 +290,7 @@ public class BookInterface {
                 authService.logout(cartService);
                 currentCustomer = null;
                 updateWelcomeLabel(null, welcomeLabel);
-                setVisiblewhenAuthChanged(null, profileBtn, logoutBtn, authBtn); // Cập nhật giao diện khi đăng xuất
+                setVisiblewhenAuthChanged(null, profileBtn, logoutBtn, authBtn, adminBtn); // Cập nhật giao diện khi đăng xuất
 
                 JOptionPane.showMessageDialog(this,
                         "✅ You have been logged out successfully!",
@@ -287,7 +299,7 @@ public class BookInterface {
             navbarPanel.add(logoutBtn);
 
             // Cap nhat trang thai hien thi khi dang nhap/khong dang nhap
-            setVisiblewhenAuthChanged(currentCustomer, profileBtn, logoutBtn, authBtn);
+            setVisiblewhenAuthChanged(currentCustomer, profileBtn, logoutBtn, authBtn, adminBtn);
 
             // Book display panel (cards)
             bookPanel = new JPanel();

@@ -56,8 +56,8 @@ public class Order {
         return statusStack.currentStatus();
     }
 
-    public void undoStatus() {
-        statusStack.popStatus();
+    public String undoStatus() {
+        return statusStack.popStatus();
     }
 
     // In chi tiết đơn hàng

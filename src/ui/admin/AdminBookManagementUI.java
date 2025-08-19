@@ -19,7 +19,7 @@ public class AdminBookManagementUI extends JPanel {
     private final BookManagementService bookService;
 
 
-    private JTextField txtId, txtTitle, txtAuthor, txtPrice, txtDate, txtSearch;
+    private JTextField txtSearch;
 
     // Add these new fields
     private SearchType currentSearchType = SearchType.LINEAR;
@@ -59,7 +59,7 @@ public class AdminBookManagementUI extends JPanel {
 
         // Sort panel
         JPanel sortPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        String[] sortOptions = {"Title", "Author", "Price", "PublishedDate"};
+        String[] sortOptions = {"Title", "Author", "Price",  "PublishedDate"};
         JComboBox<String> sortCombo = new JComboBox<>(sortOptions);
         JButton btnSortAsc = new JButton("Sort ↑");
         JButton btnSortDesc = new JButton("Sort ↓");
@@ -87,50 +87,30 @@ public class AdminBookManagementUI extends JPanel {
         add(topPanel, BorderLayout.NORTH);
 
         // === CENTER: Table ===
-        String[] columns = {"ID", "Title", "Author", "Price", "Published Date"};
-        tableModel = new DefaultTableModel(columns, 0);
+        String[] columns = {"ID", "Title", "Author", "Price", "Quantity", "Published Date"};
+        tableModel = new DefaultTableModel(columns, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
         bookTable = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(bookTable);
         add(scrollPane, BorderLayout.CENTER);
 
-        // === BOTTOM: CRUD ===
-        JPanel bottomPanel = new JPanel(new BorderLayout());
+    // === BOTTOM: CRUD BUTTONS ONLY ===
+    JPanel buttonPanel = new JPanel(new FlowLayout());
+    JButton btnAdd = new JButton("Add Book");
+    JButton btnUpdate = new JButton("Update Book");
+    JButton btnDelete = new JButton("Delete");
+    JButton btnRefresh = new JButton("Refresh");
 
-        JPanel inputPanel = new JPanel(new GridLayout(2, 5));
-        txtId = new JTextField();
-        txtTitle = new JTextField();
-        txtAuthor = new JTextField();
-        txtPrice = new JTextField();
-        txtDate = new JTextField();
+    buttonPanel.add(btnAdd);
+    buttonPanel.add(btnUpdate);
+    buttonPanel.add(btnDelete);
+    buttonPanel.add(btnRefresh);
 
-        inputPanel.add(new JLabel("ID"));
-        inputPanel.add(new JLabel("Title"));
-        inputPanel.add(new JLabel("Author"));
-        inputPanel.add(new JLabel("Price"));
-        inputPanel.add(new JLabel("Published Date"));
-
-        inputPanel.add(txtId);
-        inputPanel.add(txtTitle);
-        inputPanel.add(txtAuthor);
-        inputPanel.add(txtPrice);
-        inputPanel.add(txtDate);
-
-        bottomPanel.add(inputPanel, BorderLayout.CENTER);
-
-        JPanel buttonPanel = new JPanel(new FlowLayout());
-        JButton btnAdd = new JButton("Add");
-        JButton btnUpdate = new JButton("Update");
-        JButton btnDelete = new JButton("Delete");
-        JButton btnRefresh = new JButton("Refresh");
-
-        buttonPanel.add(btnAdd);
-        buttonPanel.add(btnUpdate);
-        buttonPanel.add(btnDelete);
-        buttonPanel.add(btnRefresh);
-
-        bottomPanel.add(buttonPanel, BorderLayout.SOUTH);
-
-        add(bottomPanel, BorderLayout.SOUTH);
+    add(buttonPanel, BorderLayout.SOUTH);
 
         // === Load data initially ===
         loadBooks(this.bookService.getAllBooks());
@@ -195,71 +175,109 @@ public class AdminBookManagementUI extends JPanel {
         });
 
         btnAdd.addActionListener(e -> {
-            try {
-                Book book = new Book(
-                        txtTitle.getText().trim(),
-                        txtAuthor.getText().trim(),
-                        Double.parseDouble(txtPrice.getText().trim()),
-                        1, // Default quantity
-                        LocalDate.parse(txtDate.getText().trim(), DateTimeFormatter.ISO_DATE),
-                        "General", // Default category
-                        null // Default image
-                );
-                this.bookService.addBook(book);
-                loadBooks(this.bookService.getAllBooks());
-                clearFields();
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this,
+            JTextField titleField = new JTextField();
+            JTextField authorField = new JTextField();
+            JTextField priceField = new JTextField();
+            JTextField dateField = new JTextField();
+            Object[] message = {
+                "Title:", titleField,
+                "Author:", authorField,
+                "Price:", priceField,
+                "Published Date (YYYY-MM-DD):", dateField
+            };
+            int option = JOptionPane.showConfirmDialog(this, message, "Add Book", JOptionPane.OK_CANCEL_OPTION);
+            if (option == JOptionPane.OK_OPTION) {
+                try {
+                    Book book = new Book(
+                        titleField.getText().trim(),
+                        authorField.getText().trim(),
+                        Double.parseDouble(priceField.getText().trim()),
+                        1,
+                        LocalDate.parse(dateField.getText().trim(), DateTimeFormatter.ISO_DATE),
+                        "General",
+                        null
+                    );
+                    this.bookService.addBook(book);
+                    loadBooks(this.bookService.getAllBooks());
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this,
                         "Invalid input: Please ensure date is in YYYY-MM-DD format\n" + ex.getMessage());
+                }
             }
         });
 
         btnUpdate.addActionListener(e -> {
-            try {
-                int selectedRow = bookTable.getSelectedRow();
-                if (selectedRow >= 0) {
-                    Book book = new Book(
-                            txtTitle.getText().trim(),
-                            txtAuthor.getText().trim(),
-                            Double.parseDouble(txtPrice.getText().trim()),
-                            1, // Default quantity
-                            LocalDate.parse(txtDate.getText().trim(), DateTimeFormatter.ISO_DATE),
-                            "General", // Default category
-                            null // Default image
-                    );
-                    this.bookService.updateBook(book);
-                    loadBooks(this.bookService.getAllBooks());
-                    clearFields();
-                } else {
-                    JOptionPane.showMessageDialog(this, "Select a row to update");
+            int selectedRow = bookTable.getSelectedRow();
+            if (selectedRow >= 0) {
+                String currentTitle = tableModel.getValueAt(selectedRow, 1).toString();
+                String currentAuthor = tableModel.getValueAt(selectedRow, 2).toString();
+                String currentPrice = tableModel.getValueAt(selectedRow, 3).toString();
+                String currentQuantity = tableModel.getValueAt(selectedRow, 4).toString();
+                String currentDate = tableModel.getValueAt(selectedRow, 5).toString();
+                JTextField titleField = new JTextField(currentTitle);
+                JTextField authorField = new JTextField(currentAuthor);
+                JTextField priceField = new JTextField(currentPrice);
+                JTextField quantityField = new JTextField(currentQuantity);
+                JTextField dateField = new JTextField(currentDate);
+                Object[] message = {
+                    "Title:", titleField,
+                    "Author:", authorField,
+                    "Price:", priceField,
+                    "Quantity:", quantityField,
+                    "Published Date (YYYY-MM-DD):", dateField
+                };
+                int option = JOptionPane.showConfirmDialog(this, message, "Update Book", JOptionPane.OK_CANCEL_OPTION);
+                if (option == JOptionPane.OK_OPTION) {
+                    try {
+                        Object idObj = tableModel.getValueAt(selectedRow, 0);
+                        int bookId;
+                        if (idObj instanceof Integer) {
+                            bookId = (Integer) idObj;
+                        } else {
+                            bookId = Integer.parseInt(idObj.toString());
+                        }
+                        Book book = new Book(
+                            titleField.getText().trim(),
+                            authorField.getText().trim(),
+                            Double.parseDouble(priceField.getText().trim()),
+                            Integer.parseInt(quantityField.getText().trim()),
+                            LocalDate.parse(dateField.getText().trim(), DateTimeFormatter.ISO_DATE),
+                            "General",
+                            null
+                            
+                        );
+                        book.setBookId(bookId);
+                        // book.setBookId(bookId); // Set the correct book ID
+                        this.bookService.updateBook(book);
+                        loadBooks(this.bookService.getAllBooks());
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(this,
+                            "Invalid input: Please ensure all fields are correct and date is in YYYY-MM-DD format\n" + ex.getMessage());
+                    }
                 }
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this,
-                        "Invalid input: Please ensure date is in YYYY-MM-DD format\n" + ex.getMessage());
+            } else {
+                JOptionPane.showMessageDialog(this, "Select a row to update");
             }
         });
 
         btnDelete.addActionListener(e -> {
             int selectedRow = bookTable.getSelectedRow();
             if (selectedRow >= 0) {
-                String bookId = (String) tableModel.getValueAt(selectedRow, 0);
-                this.bookService.deleteBook(Integer.parseInt(bookId));
+                Object idObj = tableModel.getValueAt(selectedRow, 0);
+                int bookId;
+                if (idObj instanceof Integer) {
+                    bookId = (Integer) idObj;
+                } else {
+                    bookId = Integer.parseInt(idObj.toString());
+                }
+                this.bookService.deleteBook(bookId);
                 loadBooks(this.bookService.getAllBooks());
             } else {
                 JOptionPane.showMessageDialog(this, "Select a row to delete");
             }
         });
 
-        bookTable.getSelectionModel().addListSelectionListener(e -> {
-            int row = bookTable.getSelectedRow();
-            if (row >= 0) {
-                txtId.setText((String) tableModel.getValueAt(row, 0));
-                txtTitle.setText((String) tableModel.getValueAt(row, 1));
-                txtAuthor.setText((String) tableModel.getValueAt(row, 2));
-                txtPrice.setText(String.valueOf(tableModel.getValueAt(row, 3)));
-                txtDate.setText((String) tableModel.getValueAt(row, 4));
-            }
-        });
+    // Removed selection listener for input fields (no longer needed)
     }
 
     private void loadBooks(List<Book> books) {
@@ -270,18 +288,13 @@ public class AdminBookManagementUI extends JPanel {
                     b.getTitle(),
                     b.getAuthor(),
                     b.getPrice(),
+                    b.getQuantity(),
                     b.getPublishedDate()
             });
         }
     }
 
     // Add helper method to clear fields
-    private void clearFields() {
-        txtId.setText("");
-        txtTitle.setText("");
-        txtAuthor.setText("");
-        txtPrice.setText("");
-        txtDate.setText("");
-    }
+    // Removed clearFields method (no longer needed)
 
 }

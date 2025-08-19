@@ -69,8 +69,8 @@ public class AdminCustomerManagementUI extends JPanel {
         controlPanel.add(btnDelete);
         controlPanel.add(btnRefresh);
 
-        add(tabPane, BorderLayout.CENTER);
         add(controlPanel, BorderLayout.SOUTH);
+        add(tabPane, BorderLayout.CENTER);
 
         // Load initial data
         loadUsers();
@@ -93,7 +93,7 @@ public class AdminCustomerManagementUI extends JPanel {
             String role = (u instanceof Admin) ? "Admin" : "Customer";
             allModel.addRow(new Object[]{u.getUserId(), u.getName(), role});
 
-            if (u instanceof Customer) {
+            if (!(u instanceof Admin)) {
                 customerModel.addRow(new Object[]{u.getUserId(), u.getName()});
             } else if (u instanceof Admin) {
                 adminModel.addRow(new Object[]{u.getUserId(), u.getName()});
@@ -103,10 +103,6 @@ public class AdminCustomerManagementUI extends JPanel {
 
     private void searchUsers() {
         String keyword = searchField.getText().trim();
-        if (keyword.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "⚠ Vui lòng nhập từ khóa.");
-            return;
-        }
 
         SearchType searchType = (SearchType) searchTypeBox.getSelectedItem();
         SortType sortType = (SortType) sortTypeBox.getSelectedItem();
@@ -123,11 +119,30 @@ public class AdminCustomerManagementUI extends JPanel {
     private void sortUsers(boolean ascending) {
         SortType sortType = (SortType) sortTypeBox.getSelectedItem();
         List<User> sorted = customerService.sortUsersByName(customerService.getAllUsers(), ascending, sortType);
+        JTabbedPane currenttab = (JTabbedPane) getComponent(1);
 
-        allModel.setRowCount(0);
-        for (User u : sorted) {
-            String role = (u instanceof Admin) ? "Admin" : "Customer";
-            allModel.addRow(new Object[]{u.getUserId(), u.getName(), role});
+        DefaultTableModel currentModel = switch (currenttab.getSelectedIndex()) {
+            case 0 -> allModel;
+            case 1 -> customerModel;
+            case 2 -> adminModel;
+            default -> null;
+        };
+        if (currentModel == null) return;
+        
+        if (currenttab.getSelectedIndex() == 0) {
+            currentModel.setRowCount(0);
+            for (User u : sorted) {
+                String role = (u instanceof Admin) ? "Admin" : "Customer";
+                currentModel.addRow(new Object[]{u.getUserId(), u.getName(), role});
+            }
+        } else {
+            currentModel.setRowCount(0);
+            for (User u : sorted) {
+                if ((currenttab.getSelectedIndex() == 1 && !(u instanceof Admin)) ||
+                    (currenttab.getSelectedIndex() == 2 && u instanceof Admin)) {
+                    currentModel.addRow(new Object[]{u.getUserId(), u.getName()});
+                }
+            }
         }
     }
 
