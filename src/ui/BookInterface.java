@@ -31,10 +31,6 @@ public class BookInterface {
         private CartService cartService;
         private OrderService orderService; // Thêm OrderService
 
-        private OrderManagementService orderManagementService; // Thêm OrderManagementService
-        private CustomerManagementService customerService; // Thêm CustomerService
-        private BookManagementService bookManagementService; // Thêm BookManagementService
-
         private Customer currentCustomer; // Biến toàn cục để lưu thông tin khách hàng
         private boolean isAdmin = false; // Biến toàn cục để lưu trạng thái Admin
         private JButton authBtn, profileBtn, logoutBtn, adminBtn; // Thêm biến toàn cục cho các nút
@@ -53,17 +49,7 @@ public class BookInterface {
             authService = new AuthService();
             orderService = new OrderService();
 
-            OrderQueuePending orderQueuePending = new OrderQueuePending();
-            OrderQueueProcessing orderQueueProcessing = new OrderQueueProcessing();
-            OrderQueueDone orderQueueDone = new OrderQueueDone();
-
-            orderManagementService = new OrderManagementService(
-                orderQueuePending,
-                orderQueueProcessing,
-                orderQueueDone
-            );
-            customerService = new CustomerManagementService();
-            bookManagementService = new BookManagementService();
+            
             initUI();
             loadCategories();
             loadBooks(bookService.getAllBooks());
@@ -89,7 +75,7 @@ public class BookInterface {
             profileBtn.setVisible(false);
             logoutBtn.setVisible(false);
             authBtn.setVisible(false);
-            adminBtn.setVisible(true);
+            adminBtn.setVisible(false);
 
             if (customer != null) {  // User is logged in (either admin or customer)
                 profileBtn.setVisible(true);
@@ -273,7 +259,7 @@ public class BookInterface {
 
             // Nut Admin
             adminBtn.addActionListener(e -> {
-                AdminInterface adminUI = new AdminInterface(orderManagementService, customerService, bookManagementService);
+                AdminInterface adminUI = new AdminInterface();
                 adminUI.setVisible(true);
             });
             navbarPanel.add(adminBtn);

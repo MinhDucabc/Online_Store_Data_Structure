@@ -32,7 +32,6 @@ public class AuthService {
             }
             Admin newAdmin = new Admin(name, email, "N/A", password, "","Admin");
             UserData.ADMINS.add(newAdmin);
-            adminMode = false; // Reset to default user mode after registration
             System.out.println("✅ Đăng ký Admin thành công: " + name);
             return true;
         } else {

@@ -72,7 +72,7 @@ public class AuthenticationInterface extends JFrame {
         JPasswordField registerPasswordField = new JPasswordField();
         registerPanel.add(registerPasswordField);
 
-        JButton registerBtn = new JButton("Register");
+        JButton registerBtn = new JButton("Register User");
         registerBtn.addActionListener(e -> handleRegister(registerEmailField, registerPasswordField));
         registerPanel.add(new JLabel()); // filler
         registerPanel.add(registerBtn);
@@ -147,18 +147,6 @@ public class AuthenticationInterface extends JFrame {
             statusLabel.setText("✅ Register successful as " + (isAdmin ? "Admin" : "User") + "!");
         } else {
             statusLabel.setText("❌ Register failed!");
-        }
-    }
-
-    // ✅ Handle Logout
-    private void handleLogout() {
-        if (authService.isLoggedIn()) {
-            authService.logout(cartService);
-            statusLabel.setText("✅ Logged out successfully!");
-            if (authListener != null) authListener.onAuthChanged(null);
-            dispose();
-        } else {
-            statusLabel.setText("⚠️ You are not logged in!");
         }
     }
 
