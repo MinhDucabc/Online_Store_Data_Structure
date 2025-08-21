@@ -4,6 +4,9 @@ import javax.swing.*;
 import java.awt.*;
 
 import services.Admin.OrderManagementService;
+import structures.orderqueuedone.OrderQueueDone;
+import structures.orderqueuepending.OrderQueuePending;
+import structures.orderqueueprocessing.OrderQueueProcessing;
 import services.Admin.CustomerManagementService;
 import services.Admin.BookManagementService;
 import ui.admin.AdminOrderManagementUI;
@@ -16,12 +19,17 @@ public class AdminInterface extends JFrame {
     private final BookManagementService bookService;
     private JTabbedPane tabbedPane;
 
-    public AdminInterface(OrderManagementService orderService,
-                          CustomerManagementService customerService,
-                          BookManagementService bookService) {
-        this.orderService = orderService;
-        this.customerService = customerService;
-        this.bookService = bookService;
+    public AdminInterface() {
+        OrderQueuePending orderQueuePending = new OrderQueuePending();
+        OrderQueueProcessing orderQueueProcessing = new OrderQueueProcessing();
+        OrderQueueDone orderQueueDone = new OrderQueueDone();
+        this.orderService = new OrderManagementService(
+            orderQueuePending,
+            orderQueueProcessing,
+            orderQueueDone
+        );
+        this.customerService = new CustomerManagementService();
+        this.bookService = new BookManagementService();
 
         setTitle("Admin Dashboard");
         setSize(1000, 600);
